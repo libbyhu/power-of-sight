@@ -10,10 +10,18 @@
     "paragraph1": "進入眼中的一切，終將抵達靈魂深處，悄然形塑我們所看見的世界。",
     "paragraph2": "那些讀過的文字、看過的影像、曾經打動我們的片刻，最後都成為我們的一部分。",
     "roomHint": "書、電影、影集與動漫，都可以自在放在一起。不必分類，慢慢留下你喜歡的故事。",
-    "welcomeBack": "歡迎回來",
-    "chooseRoom": "今天想走進哪一間書房？",
-    "noRoom": "還沒有書房？",
-    "createRoom": "現在建立一間"
+    "tagline": "為看過的故事，留一個位置。",
+    "createRoom": "建立我的書房",
+    "signIn": "登入",
+    "enterRoom": "走進我的書房",
+    "aboutEyebrow": "關於書房",
+    "aboutTitle": "把故事帶回自己的書房"
+  },
+  "intro": {
+    "skip": "跳過動畫",
+    "replay": "重播動畫",
+    "alt": "小旅人走上紅磚樓梯，推開木門，進入有月光拱窗、壁爐和閱讀角落的古堡圖書交誼廳。",
+    "stillAlt": "月光拱窗下的古堡圖書交誼廳：壁爐、錯層書架與閱讀角落。"
   },
   "auth": {
     "loginTitle": "歡迎回來",
@@ -62,22 +70,11 @@
     "resultCount": "找到 {count} 部",
     "statsTotal": "共 {count} 部",
     "loading": "讀取中…",
-    "loadMore": "看更多"
-  },
-  "doors": {
-    "title": "你想走進哪一扇門？",
-    "lead": "爬上旋轉樓梯，眼前有兩扇門。兩邊放的是同一批作品，只是擺法不同。",
-    "tidyTitle": "整齊書架",
-    "tidyDescription": "依種類分層排好，同一層照名稱排列。喜歡一眼就找到的人，會在這裡安心。",
-    "artisticTitle": "散落書房",
-    "artisticDescription": "不分種類、不排順序，新放進來的就在前面。像剛下班隨手放下的書，自在又好找。",
-    "enter": "推門進去",
-    "switchLater": "之後隨時可以換到另一扇門，作品都不會不見。",
-    "tidyShort": "整齊書架",
-    "artisticShort": "散落書房",
-    "switchLabel": "書房擺法",
-    "tidyBannerAlt": "整齊排列的像素書櫃，三層書依顏色排得整整齊齊。",
-    "artisticBannerAlt": "月光下的書房：暖燈照著沙發上看書的人和貓，四周堆著書、盆栽和水晶。"
+    "loadMore": "看更多",
+    "eyebrow": "我的書房",
+    "sortLabel": "排序",
+    "sortRecent": "最新放入",
+    "sortTitle": "依種類與名稱"
   },
   "entry": {
     "addTitle": "放進書房",

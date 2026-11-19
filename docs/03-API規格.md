@@ -17,9 +17,8 @@
 
 | 方法 | 路徑 | 說明 |
 |---|---|---|
-| GET | /api/me/room | `{ name, intro, quoteText, quoteSource, layoutStyle, isPublic, updatedAt }`；`layoutStyle` 為 null 代表還沒選門 |
-| PUT | /api/me/room | `{ name, intro?, quoteText?, quoteSource? }`，整份取代（不影響選好的門） |
-| PUT | /api/me/room/layout | `{ layoutStyle: "TIDY" \| "ARTISTIC" }`，選門或換門 |
+| GET | /api/me/room | `{ name, intro, quoteText, quoteSource, isPublic, updatedAt }` |
+| PUT | /api/me/room | `{ name, intro?, quoteText?, quoteSource? }`，整份取代 |
 | GET | /api/me/room/stats | `{ total, byType: { BOOK: 2, … }, byStatus: { WANT: 1, NONE: 3, … } }` |
 
 ## 收藏

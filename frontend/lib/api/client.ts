@@ -1,4 +1,4 @@
-import type { Entry, EntryInput, EntryStatus, LayoutStyle, MediaType, Page, Room, RoomStats, User } from './types';
+import type { Entry, EntryInput, EntryStatus, MediaType, Page, Room, RoomStats, User } from './types';
 
 /** 後端回傳的錯誤。code 對應 messages/*.json 裡的 errors.* 翻譯。 */
 export class ApiError extends Error {
@@ -54,8 +54,6 @@ export const roomApi = {
   get: () => request<Room>('/me/room'),
   update: (body: { name: string; intro: string | null; quoteText: string | null; quoteSource: string | null }) =>
     request<Room>('/me/room', { method: 'PUT', json: body }),
-  setLayout: (layoutStyle: LayoutStyle) =>
-    request<Room>('/me/room/layout', { method: 'PUT', json: { layoutStyle } }),
   stats: () => request<RoomStats>('/me/room/stats'),
 };
 

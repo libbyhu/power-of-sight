@@ -1,16 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 import type { MediaType } from '@/lib/api/types';
 
-// 沒有封面時，用種類顯示一個淡淡的書背色塊，讓混放的書房也有層次
+// 沒有封面時，依種類給一個低彩度的深色書背，
+// 讓混放的書房在深色背景上仍有層次。
 const spine: Record<MediaType, string> = {
-  BOOK: 'bg-[#E4D6B5]',
-  MOVIE: 'bg-[#DCD3C0]',
-  TV: 'bg-[#D9D8C4]',
-  ANIME: 'bg-[#E6D2C4]',
+  BOOK: 'bg-[#4a2f2c]',
+  MOVIE: 'bg-[#2f2a38]',
+  TV: 'bg-[#2b3330]',
+  ANIME: 'bg-[#3b2b38]',
 };
 
 /**
- * 封面用一般的 <img>：網址是使用者自己貼的，來源網站不固定，
+ * 封面用一般的 <img>：網址是會員自己貼的，來源網站不固定，
  * next/image 需要事先列出允許的網域，不適合這裡。
  */
 export function Cover({ url, title, type }: { url: string | null; title: string; type: MediaType }) {
@@ -25,10 +26,12 @@ export function Cover({ url, title, type }: { url: string | null; title: string;
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div className="flex h-full items-center justify-center px-3 text-center font-serif text-sm leading-snug text-ink-soft">
+        <div className="flex h-full items-center justify-center px-3 text-center font-serif text-sm leading-snug text-muted">
           {title}
         </div>
       )}
+      {/* 細細的內框，讓封面像一個放在架上的物件 */}
+      <div className="pointer-events-none absolute inset-0 border border-parchment/10" />
     </div>
   );
 }

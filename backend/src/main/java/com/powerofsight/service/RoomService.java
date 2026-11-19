@@ -2,7 +2,6 @@ package com.powerofsight.service;
 
 import com.powerofsight.dto.RoomResponse;
 import com.powerofsight.dto.RoomStatsResponse;
-import com.powerofsight.dto.UpdateLayoutRequest;
 import com.powerofsight.dto.UpdateRoomRequest;
 import com.powerofsight.entity.Room;
 import com.powerofsight.exception.ApiException;
@@ -37,14 +36,6 @@ public class RoomService {
         room.setIntro(Text.clean(request.intro()));
         room.setQuoteText(Text.clean(request.quoteText()));
         room.setQuoteSource(Text.clean(request.quoteSource()));
-        return RoomResponse.from(rooms.saveAndFlush(room));
-    }
-
-    /** 走進另一扇門：只換擺放風格，收藏完全不動。 */
-    @Transactional
-    public RoomResponse updateLayout(UUID ownerId, UpdateLayoutRequest request) {
-        Room room = find(ownerId);
-        room.setLayoutStyle(request.layoutStyle());
         return RoomResponse.from(rooms.saveAndFlush(room));
     }
 

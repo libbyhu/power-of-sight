@@ -26,13 +26,13 @@ export function SettingsView() {
 
   return (
     <div className="flex max-w-prose flex-col gap-8">
-      <h1 className="font-serif text-2xl text-ink">{t('title')}</h1>
+      <h1 className="font-serif text-2xl text-parchment">{t('title')}</h1>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-medium text-ink-soft">{t('account')}</h2>
+        <h2 className="text-sm font-medium text-muted">{t('account')}</h2>
         {user && (
-          <p className="text-sm text-ink">
-            {user.displayName} · <span className="text-ink-soft">{user.email}</span>
+          <p className="text-sm text-parchment">
+            {user.displayName} · <span className="text-muted">{user.email}</span>
           </p>
         )}
         <button onClick={handleLogout} className={`${secondaryButton} w-fit`}>
@@ -41,14 +41,14 @@ export function SettingsView() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-medium text-ink-soft">{t('language')}</h2>
+        <h2 className="text-sm font-medium text-muted">{t('language')}</h2>
         <div className="flex gap-3 text-sm">
           {(['zh-TW', 'en'] as const).map((l) => (
             <Link
               key={l}
               href={pathname}
               locale={l}
-              className={`rounded-card border px-3 py-1.5 ${l === locale ? 'border-teal text-teal' : 'border-line hover:border-teal'}`}
+              className={`rounded-card border px-3 py-1.5 ${l === locale ? 'border-amber text-amber' : 'border-edge hover:border-amber'}`}
             >
               {l === 'zh-TW' ? '中文' : 'English'}
             </Link>
@@ -57,8 +57,8 @@ export function SettingsView() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-medium text-ink-soft">{t('privacy')}</h2>
-        <p className="text-sm text-ink">{t('privacyNote')}</p>
+        <h2 className="text-sm font-medium text-muted">{t('privacy')}</h2>
+        <p className="text-sm text-parchment">{t('privacyNote')}</p>
       </section>
     </div>
   );

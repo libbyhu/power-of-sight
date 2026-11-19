@@ -40,7 +40,7 @@ public class EntryService {
         this.rooms = rooms;
     }
 
-    /** 列表排序：RECENT = 最新放的在前（散落書房）；TITLE = 依種類、名稱排列（整齊書架）。 */
+    /** 列表排序：RECENT = 最新放的在前；TITLE = 依種類、再依名稱排列。 */
     public enum ListSort { RECENT, TITLE }
 
     /** 所有種類混在一起列出；種類、狀態、關鍵字都只是選填的篩選。 */

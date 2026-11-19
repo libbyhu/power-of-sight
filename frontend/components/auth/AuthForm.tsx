@@ -37,12 +37,8 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
       } else {
         await authApi.login({ email, password });
       }
-      // 從首頁的門進來的，登入後直接走進那間書房
-      const door = searchParams.get('door');
-      const target =
-        door === 'TIDY' || door === 'ARTISTIC' ? `/${locale}/room?door=${door}` : safeNext(searchParams.get('next'), locale);
       // 整頁重新載入：讓伺服器端的導覽列也讀到新的登入 cookie
-      window.location.assign(target);
+      window.location.assign(safeNext(searchParams.get('next'), locale));
     } catch (err) {
       if (err instanceof ApiError && err.fields) {
         setFieldErrors(Object.fromEntries(Object.keys(err.fields).map((k) => [k, t(`invalid.${k}` as 'invalid.email')])));
@@ -54,8 +50,8 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-sm flex-col gap-4" noValidate>
-      <h1 className="font-serif text-2xl text-ink">{mode === 'login' ? t('loginTitle') : t('registerTitle')}</h1>
-      <p className="text-sm text-ink-soft">{mode === 'login' ? t('loginLead') : t('registerLead')}</p>
+      <h1 className="font-serif text-2xl text-parchment">{mode === 'login' ? t('loginTitle') : t('registerTitle')}</h1>
+      <p className="text-sm text-muted">{mode === 'login' ? t('loginLead') : t('registerLead')}</p>
 
       {mode === 'register' && (
         <Field label={t('displayName')} error={fieldErrors.displayName}>
@@ -101,15 +97,9 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
         {submitting ? t('submitting') : mode === 'login' ? t('loginButton') : t('registerButton')}
       </button>
 
-      <p className="text-sm text-ink-soft">
+      <p className="text-sm text-muted">
         {mode === 'login' ? t('noAccount') : t('haveAccount')}{' '}
-        <Link
-          href={{
-            pathname: mode === 'login' ? '/register' : '/login',
-            query: searchParams.get('door') ? { door: searchParams.get('door')! } : {},
-          }}
-          className="text-teal hover:underline"
-        >
+        <Link href={mode === 'login' ? '/register' : '/login'} className="text-amber hover:underline">
           {mode === 'login' ? t('toRegister') : t('toLogin')}
         </Link>
       </p>

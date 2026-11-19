@@ -38,7 +38,7 @@ export function RoomEditor() {
   }, [redirectIfSignedOut, toMessage]);
 
   if (!draft) {
-    return message ? <FormMessage tone="error">{message.text}</FormMessage> : <p className="text-sm text-ink-soft">…</p>;
+    return message ? <FormMessage tone="error">{message.text}</FormMessage> : <p className="text-sm text-muted">…</p>;
   }
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(saved);
@@ -75,10 +75,10 @@ export function RoomEditor() {
 
   return (
     <form onSubmit={handleSave} className="flex max-w-prose flex-col gap-6">
-      <Link href="/room" className="text-sm text-ink-soft hover:text-teal">
+      <Link href="/room" className="text-sm text-muted hover:text-amber">
         ← {t('back')}
       </Link>
-      <h1 className="font-serif text-2xl text-ink">{t('title')}</h1>
+      <h1 className="font-serif text-2xl text-parchment">{t('title')}</h1>
 
       <Field label={t('name')}>
         <input value={draft.name} onChange={(e) => set('name', e.target.value)} maxLength={60} className={inputClass} />
@@ -94,10 +94,10 @@ export function RoomEditor() {
         />
       </Field>
 
-      <div className="flex flex-col gap-3 rounded-card border border-line p-4">
+      <div className="flex flex-col gap-3 rounded-card border border-edge p-4">
         <div>
-          <h2 className="font-serif text-lg text-ink">{t('quoteTitle')}</h2>
-          <p className="mt-1 text-xs text-ink-soft">{t('quoteHint')}</p>
+          <h2 className="font-serif text-lg text-parchment">{t('quoteTitle')}</h2>
+          <p className="mt-1 text-xs text-muted">{t('quoteHint')}</p>
         </div>
         <Field label={t('quoteText')}>
           <textarea
@@ -119,14 +119,14 @@ export function RoomEditor() {
         </Field>
       </div>
 
-      <p className="rounded-card border border-line bg-paper-dim px-3 py-2 text-xs text-ink-soft">{t('privateNotice')}</p>
+      <p className="rounded-card border border-edge bg-surface px-3 py-2 text-xs text-muted">{t('privateNotice')}</p>
 
-      <div className="flex items-center gap-3 border-t border-line pt-4">
+      <div className="flex items-center gap-3 border-t border-edge pt-4">
         <button type="submit" disabled={!dirty || saving} className={primaryButton}>
           {saving ? t('saving') : t('save')}
         </button>
         {message && <FormMessage tone={message.tone}>{message.text}</FormMessage>}
-        {!message && dirty && <span className="text-sm text-ink-soft">{t('unsaved')}</span>}
+        {!message && dirty && <span className="text-sm text-muted">{t('unsaved')}</span>}
       </div>
     </form>
   );

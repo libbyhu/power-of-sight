@@ -130,7 +130,7 @@ class EntryApiTest extends ApiTestSupport {
     }
 
     @Test
-    @DisplayName("整齊書架用 sort=TITLE：依種類、再依名稱排列")
+    @DisplayName("sort=TITLE：依種類、再依名稱排列；預設最新的在前")
     void sortByTitle() throws Exception {
         Cookie alice = register("alice@example.com", "Alice");
         addEntry(alice, Map.of("type", "MOVIE", "title", "C 電影"));

@@ -45,17 +45,17 @@ export function EntryDetail({ id }: { id: string }) {
     return (
       <div className="flex flex-col gap-3">
         <FormMessage tone="error">{loadError}</FormMessage>
-        <Link href="/room" className="text-sm text-teal hover:underline">
+        <Link href="/room" className="text-sm text-amber hover:underline">
           ← {t('backToRoom')}
         </Link>
       </div>
     );
   }
-  if (!entry) return <p className="text-sm text-ink-soft">{t('loading')}</p>;
+  if (!entry) return <p className="text-sm text-muted">{t('loading')}</p>;
 
   return (
     <div className="flex flex-col gap-6">
-      <Link href="/room" className="text-sm text-ink-soft hover:text-teal">
+      <Link href="/room" className="text-sm text-muted hover:text-amber">
         ← {t('backToRoom')}
       </Link>
 
@@ -66,9 +66,9 @@ export function EntryDetail({ id }: { id: string }) {
 
         <div className="flex flex-col gap-6">
           <div>
-            <p className="text-xs uppercase tracking-wider text-ink-soft/70">{tTypes(entry.type)}</p>
-            <h1 className="font-serif text-2xl text-ink">{entry.title}</h1>
-            {entry.originalTitle && <p className="text-sm text-ink-soft">{entry.originalTitle}</p>}
+            <p className="text-xs uppercase tracking-wider text-muted/80">{tTypes(entry.type)}</p>
+            <h1 className="font-serif text-2xl text-parchment">{entry.title}</h1>
+            {entry.originalTitle && <p className="text-sm text-muted">{entry.originalTitle}</p>}
           </div>
 
           {/* key 換掉時表單會用最新資料重新建立（儲存後 version 會 +1） */}
@@ -91,16 +91,16 @@ export function EntryDetail({ id }: { id: string }) {
             <div className="ml-auto flex items-center gap-2">
               {confirmDelete ? (
                 <>
-                  <span className="text-sm text-ink-soft">{t('deleteConfirm')}</span>
-                  <button type="button" onClick={handleDelete} className="rounded-card bg-heart px-3 py-1.5 text-sm text-paper">
+                  <span className="text-sm text-muted">{t('deleteConfirm')}</span>
+                  <button type="button" onClick={handleDelete} className="rounded-card bg-heart px-3 py-1.5 text-sm text-on-amber">
                     {t('deleteYes')}
                   </button>
-                  <button type="button" onClick={() => setConfirmDelete(false)} className="text-sm text-ink-soft hover:text-ink">
+                  <button type="button" onClick={() => setConfirmDelete(false)} className="text-sm text-muted hover:text-parchment">
                     {t('deleteNo')}
                   </button>
                 </>
               ) : (
-                <button type="button" onClick={() => setConfirmDelete(true)} className="text-sm text-ink-soft hover:text-heart">
+                <button type="button" onClick={() => setConfirmDelete(true)} className="text-sm text-muted hover:text-heart">
                   {t('delete')}
                 </button>
               )}

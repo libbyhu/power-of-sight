@@ -10,10 +10,18 @@
     "paragraph1": "Everything that enters our eyes eventually reaches the depths of the soul, quietly shaping the world we see.",
     "paragraph2": "The words we've read, the images we've watched, the moments that once moved us — in the end, they all become part of who we are.",
     "roomHint": "Books, films, series and anime can all live together here. No sorting required — just keep the stories you love.",
-    "welcomeBack": "Welcome back",
-    "chooseRoom": "Which room will you step into today?",
-    "noRoom": "No room yet?",
-    "createRoom": "Create one now"
+    "tagline": "A place for every story you've seen.",
+    "createRoom": "Create my room",
+    "signIn": "Sign in",
+    "enterRoom": "Enter my room",
+    "aboutEyebrow": "ABOUT THE ROOM",
+    "aboutTitle": "Bring your stories home"
+  },
+  "intro": {
+    "skip": "Skip intro",
+    "replay": "Replay intro",
+    "alt": "A small traveler climbs red-brick stairs, pushes open a wooden door and enters a castle library lounge with a moonlit arched window, a fireplace and reading nooks.",
+    "stillAlt": "A castle library lounge under a moonlit arched window: fireplace, tiered bookshelves and reading nooks."
   },
   "auth": {
     "loginTitle": "Welcome back",
@@ -62,22 +70,11 @@
     "resultCount": "{count} found",
     "statsTotal": "{count} in total",
     "loading": "Loading…",
-    "loadMore": "Show more"
-  },
-  "doors": {
-    "title": "Which door will you open?",
-    "lead": "At the top of the spiral stairs are two doors. Behind both are the same works — just arranged differently.",
-    "tidyTitle": "The Tidy Shelves",
-    "tidyDescription": "Everything shelved by kind and ordered by title. For those who like to find things at a glance.",
-    "artisticTitle": "The Scattered Study",
-    "artisticDescription": "No sorting, no grouping — whatever you added last sits up front. Like books set down after a long day.",
-    "enter": "Step inside",
-    "switchLater": "You can switch doors any time — nothing in your room will be lost.",
-    "tidyShort": "Tidy",
-    "artisticShort": "Scattered",
-    "switchLabel": "Room arrangement",
-    "tidyBannerAlt": "A pixel bookcase with three shelves of books standing neatly in color order.",
-    "artisticBannerAlt": "A moonlit study: a warm lamp over a reader and a cat on the sofa, surrounded by stacks of books, plants and crystals."
+    "loadMore": "Show more",
+    "eyebrow": "MY ROOM",
+    "sortLabel": "Sort",
+    "sortRecent": "Recently added",
+    "sortTitle": "By kind and title"
   },
   "entry": {
     "addTitle": "Add to room",

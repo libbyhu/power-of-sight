@@ -2,8 +2,6 @@ package com.powerofsight.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -32,11 +30,6 @@ public class Room {
 
     @Column(name = "quote_source", length = 100)
     private String quoteSource;
-
-    /** null 代表還沒選過門。 */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "layout_style", length = 10)
-    private LayoutStyle layoutStyle;
 
     @Column(name = "is_public", nullable = false)
     private boolean isPublic;
@@ -70,7 +63,6 @@ public class Room {
     public String getIntro() { return intro; }
     public String getQuoteText() { return quoteText; }
     public String getQuoteSource() { return quoteSource; }
-    public LayoutStyle getLayoutStyle() { return layoutStyle; }
     public boolean isPublic() { return isPublic; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
 
@@ -78,5 +70,4 @@ public class Room {
     public void setIntro(String intro) { this.intro = intro; }
     public void setQuoteText(String quoteText) { this.quoteText = quoteText; }
     public void setQuoteSource(String quoteSource) { this.quoteSource = quoteSource; }
-    public void setLayoutStyle(LayoutStyle layoutStyle) { this.layoutStyle = layoutStyle; }
 }

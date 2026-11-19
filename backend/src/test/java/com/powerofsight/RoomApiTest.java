@@ -51,36 +51,4 @@ class RoomApiTest extends ApiTestSupport {
                 .andExpect(jsonPath("$.byStatus.NONE").value(1))
                 .andExpect(jsonPath("$.byStatus.WANT").value(1));
     }
-
-    @Test
-    @DisplayName("兩扇門：一開始還沒選；選了之後可以隨時換，收藏不受影響")
-    void chooseAndSwitchDoor() throws Exception {
-        Cookie alice = register("alice@example.com", "Alice");
-        addEntry(alice, Map.of("type", "BOOK", "title", "挪威的森林"));
-
-        mvc.perform(getAs(alice, "/api/me/room"))
-                .andExpect(jsonPath("$.layoutStyle").doesNotExist());
-
-        mvc.perform(withJson(putAs(alice, "/api/me/room/layout"), Map.of("layoutStyle", "TIDY")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.layoutStyle").value("TIDY"));
-
-        mvc.perform(withJson(putAs(alice, "/api/me/room/layout"), Map.of("layoutStyle", "ARTISTIC")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.layoutStyle").value("ARTISTIC"));
-
-        mvc.perform(getAs(alice, "/api/me/entries")).andExpect(jsonPath("$.totalItems").value(1));
-    }
-
-    @Test
-    @DisplayName("不認得的門會被拒絕；改名稱不會把選好的門洗掉")
-    void layoutValidationAndIndependence() throws Exception {
-        Cookie alice = register("alice@example.com", "Alice");
-        mvc.perform(withJson(putAs(alice, "/api/me/room/layout"), Map.of("layoutStyle", "MESSY")))
-                .andExpect(status().isBadRequest());
-
-        mvc.perform(withJson(putAs(alice, "/api/me/room/layout"), Map.of("layoutStyle", "TIDY")));
-        mvc.perform(withJson(putAs(alice, "/api/me/room"), Map.of("name", "新名字")))
-                .andExpect(jsonPath("$.layoutStyle").value("TIDY"));
-    }
 }

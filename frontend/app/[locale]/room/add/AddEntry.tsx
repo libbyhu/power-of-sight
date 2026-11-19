@@ -24,7 +24,7 @@ export function AddEntry() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-serif text-2xl text-ink">{t('addTitle')}</h1>
+      <h1 className="font-serif text-2xl text-parchment">{t('addTitle')}</h1>
       <EntryForm
         defaults={defaults}
         submitLabel={t('addButton')}

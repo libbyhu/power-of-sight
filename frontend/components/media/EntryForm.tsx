@@ -113,7 +113,7 @@ export function EntryForm({
     <form onSubmit={handleSubmit} className="flex max-w-xl flex-col gap-6" noValidate>
       {/* 種類只決定「作者／導演」這類欄位怎麼稱呼，作品還是放在同一間書房 */}
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-1 text-sm text-ink-soft">{t('type')}</legend>
+        <legend className="mb-1 text-sm text-muted">{t('type')}</legend>
         <div className="flex flex-wrap gap-2">
           {MEDIA_TYPES.map((opt) => (
             <button
@@ -123,8 +123,8 @@ export function EntryForm({
               aria-pressed={draft.type === opt}
               className={
                 draft.type === opt
-                  ? 'rounded-card bg-teal px-3 py-1.5 text-sm font-medium text-paper'
-                  : 'rounded-card border border-line px-3 py-1.5 text-sm text-ink-soft hover:border-teal hover:text-teal'
+                  ? 'rounded-card bg-amber px-3 py-1.5 text-sm font-medium text-on-amber'
+                  : 'rounded-card border border-edge px-3 py-1.5 text-sm text-muted hover:border-amber hover:text-amber'
               }
             >
               {tTypes(opt)}
@@ -164,8 +164,8 @@ export function EntryForm({
         />
       </Field>
 
-      <div className="flex flex-col gap-5 rounded-card border border-line p-4">
-        <p className="text-xs text-ink-soft">{t('notesHint')}</p>
+      <div className="flex flex-col gap-5 rounded-card border border-edge p-4">
+        <p className="text-xs text-muted">{t('notesHint')}</p>
 
         <Field label={t('preference')}>
           <HeartPreferencePicker preference={draft.preference} onChange={(p) => set('preference', p)} />
@@ -179,7 +179,7 @@ export function EntryForm({
             rows={4}
             className={inputClass}
           />
-          <span className="self-end text-xs text-ink-soft">
+          <span className="self-end text-xs text-muted">
             {draft.review.length} / {REVIEW_MAX}
           </span>
         </Field>
@@ -211,14 +211,14 @@ export function EntryForm({
         <div className="flex flex-col gap-2">
           <FormMessage tone="error">{error}</FormMessage>
           {conflict && (
-            <button type="button" onClick={() => window.location.reload()} className="w-fit text-sm text-teal underline">
+            <button type="button" onClick={() => window.location.reload()} className="w-fit text-sm text-amber underline">
               {t('reload')}
             </button>
           )}
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-line pt-4">
+      <div className="flex flex-wrap items-center gap-3 border-t border-edge pt-4">
         <button type="submit" disabled={saving} className={primaryButton}>
           {saving ? t('saving') : submitLabel}
         </button>

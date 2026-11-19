@@ -12,18 +12,16 @@ import {
   MEDIA_TYPES,
   type Entry,
   type EntryStatus,
-  type LayoutStyle,
   type MediaType,
   type Room,
   type RoomStats,
 } from '@/lib/api/types';
-import { DoorChooser } from '@/components/room/DoorChooser';
-import { LayoutSwitch, ScatteredRoom, TidyShelves } from '@/components/room/LayoutViews';
-import { RoomBanner } from '@/components/room/RoomBanner';
-import { FormMessage, inputClass, primaryButton, secondaryButton } from '@/components/ui/Field';
+import { MediaCard } from '@/components/media/MediaCard';
+import { TypeGlyph } from '@/components/media/TypeGlyph';
+import { Eyebrow, FormMessage, inputClass, primaryButton, secondaryButton } from '@/components/ui/Field';
 
-// 整齊書架一次多讀一些，書架才不會只排一半
-const PAGE_SIZE: Record<LayoutStyle, number> = { TIDY: 60, ARTISTIC: 24 };
+const PAGE_SIZE = 24;
+type Sort = 'RECENT' | 'TITLE';
 
 function parseType(v: string | null): MediaType | null {
   return MEDIA_TYPES.includes(v as MediaType) ? (v as MediaType) : null;
@@ -33,9 +31,9 @@ function parseStatus(v: string | null): EntryStatus | null {
 }
 
 /**
- * 我的書房。第一次進來先選一扇門（整齊書架／散落書房），之後隨時可以切換。
- * 種類、狀態、關鍵字都只是「篩選」，而且會寫進網址（?type=BOOK），
- * 所以重新整理或按上一頁都會留在同一個篩選。
+ * 我的書房：所有作品放在同一間。
+ * 種類、狀態、關鍵字、排序都只是「篩選」，而且會寫進網址（?type=BOOK&sort=TITLE），
+ * 所以重新整理或按上一頁都會留在同一個畫面。
  */
 export function RoomView() {
   const t = useTranslations('room');
@@ -50,6 +48,7 @@ export function RoomView() {
   const type = parseType(searchParams.get('type'));
   const status = parseStatus(searchParams.get('status'));
   const q = searchParams.get('q') ?? '';
+  const sort: Sort = searchParams.get('sort') === 'TITLE' ? 'TITLE' : 'RECENT';
 
   const [room, setRoom] = useState<Room | null>(null);
   const [stats, setStats] = useState<RoomStats | null>(null);
@@ -60,7 +59,6 @@ export function RoomView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState(q);
-  const layout = room?.layoutStyle ?? null;
 
   // 書房名稱、介紹、統計：進來時讀一次
   useEffect(() => {
@@ -72,35 +70,16 @@ export function RoomView() {
       .catch((err) => redirectIfSignedOut(err) || setError(toMessage(err)));
   }, [redirectIfSignedOut, toMessage]);
 
-  // 從首頁的門（註冊／登入後）帶著 ?door= 進來：書房讀到後就走進那扇門，再把參數從網址拿掉
-  const roomLoaded = room !== null;
-  useEffect(() => {
-    const door = searchParams.get('door');
-    if (!room || (door !== 'TIDY' && door !== 'ARTISTIC')) return;
-    if (room.layoutStyle !== door) chooseLayout(door);
-    updateFilter('door', null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomLoaded]);
-
-  // 篩選條件改變 → 從第一頁重新讀
-  // 每次讀取都編號：換門或改篩選時，可能有舊的請求比較晚回來，只採用最新那一次的結果
+  // 每次讀取都編號：快速切換篩選時，舊的請求可能比較晚回來，只採用最新那一次的結果
   const requestId = useRef(0);
 
   const load = useCallback(
     async (nextPage: number) => {
-      if (!layout) return;
       const id = ++requestId.current;
       setLoading(true);
       setError(null);
       try {
-        const result = await entryApi.list({
-          type,
-          status,
-          q,
-          sort: layout === 'TIDY' ? 'TITLE' : 'RECENT',
-          page: nextPage,
-          size: PAGE_SIZE[layout],
-        });
+        const result = await entryApi.list({ type, status, q, sort, page: nextPage, size: PAGE_SIZE });
         if (id !== requestId.current) return;
         setEntries((prev) => (nextPage === 0 ? result.items : [...prev, ...result.items]));
         setPage(result.page);
@@ -113,9 +92,10 @@ export function RoomView() {
         if (id === requestId.current) setLoading(false);
       }
     },
-    [layout, type, status, q, redirectIfSignedOut, toMessage],
+    [type, status, q, sort, redirectIfSignedOut, toMessage],
   );
 
+  // 篩選條件改變 → 從第一頁重新讀
   useEffect(() => {
     load(0);
   }, [load]);
@@ -133,20 +113,7 @@ export function RoomView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
-  // 走進另一扇門：畫面先換，後端存失敗再換回來
-  async function chooseLayout(style: LayoutStyle) {
-    if (!room) return;
-    const previous = room;
-    setRoom({ ...room, layoutStyle: style });
-    try {
-      setRoom(await roomApi.setLayout(style));
-    } catch (err) {
-      setRoom(previous);
-      if (!redirectIfSignedOut(err)) setError(toMessage(err));
-    }
-  }
-
-  function updateFilter(key: 'type' | 'status' | 'q' | 'door', value: string | null) {
+  function updateFilter(key: 'type' | 'status' | 'q' | 'sort', value: string | null) {
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set(key, value);
     else params.delete(key);
@@ -157,28 +124,17 @@ export function RoomView() {
   const filtered = Boolean(type || status || q);
   const addHref = status === 'WANT' ? '/room/add?status=WANT' : type ? `/room/add?type=${type}` : '/room/add';
 
-  if (room && !layout && !searchParams.get('door')) {
-    return (
-      <>
-        {error && <FormMessage tone="error">{error}</FormMessage>}
-        <DoorChooser onChoose={chooseLayout} />
-      </>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-8">
-      {layout && <RoomBanner layout={layout} />}
-
       {/* 書房門牌 */}
-      <section className="flex flex-col gap-3 border-b border-line pb-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      <section className="flex flex-col gap-3 border-b border-edge pb-6">
+        <Eyebrow>{t('eyebrow')}</Eyebrow>
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
-            <h1 className="font-serif text-2xl text-ink sm:text-3xl">{room?.name ?? ' '}</h1>
-            {room?.intro && <p className="max-w-prose text-sm leading-relaxed text-ink-soft">{room.intro}</p>}
+            <h1 className="text-3xl font-extrabold text-parchment sm:text-4xl">{room?.name ?? ' '}</h1>
+            {room?.intro && <p className="max-w-prose text-sm leading-relaxed text-muted">{room.intro}</p>}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {layout && <LayoutSwitch value={layout} onChange={chooseLayout} />}
             <Link href="/room/edit" className={secondaryButton}>
               {t('decorate')}
             </Link>
@@ -188,17 +144,17 @@ export function RoomView() {
           </div>
         </div>
         {room?.quoteText && (
-          <blockquote className="max-w-prose font-serif text-base italic text-ink">
+          <blockquote className="max-w-prose border-l-2 border-amber pl-3 font-serif text-base text-parchment">
             「{room.quoteText}」
-            {room.quoteSource && <span className="ml-2 text-xs not-italic text-ink-soft">— {room.quoteSource}</span>}
+            {room.quoteSource && <span className="ml-2 text-xs text-muted">— {room.quoteSource}</span>}
           </blockquote>
         )}
         {stats && stats.total > 0 && (
-          <p className="text-xs text-ink-soft">
-            {t('statsTotal', { count: stats.total })}
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+            <span>{t('statsTotal', { count: stats.total })}</span>
             {MEDIA_TYPES.filter((m) => stats.byType[m]).map((m) => (
-              <span key={m}>
-                {' · '}
+              <span key={m} className="inline-flex items-center gap-1.5">
+                <TypeGlyph type={m} />
                 {tTypes(m)} {stats.byType[m]}
               </span>
             ))}
@@ -229,14 +185,25 @@ export function RoomView() {
               </TabLink>
             ))}
           </div>
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('search')}
-            aria-label={t('search')}
-            className={`${inputClass} sm:w-64`}
-          />
+          <div className="flex items-center gap-2">
+            <select
+              value={sort}
+              onChange={(e) => updateFilter('sort', e.target.value === 'TITLE' ? 'TITLE' : null)}
+              aria-label={t('sortLabel')}
+              className={inputClass}
+            >
+              <option value="RECENT">{t('sortRecent')}</option>
+              <option value="TITLE">{t('sortTitle')}</option>
+            </select>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t('search')}
+              aria-label={t('search')}
+              className={`${inputClass} w-full sm:w-60`}
+            />
+          </div>
         </div>
       </section>
 
@@ -244,7 +211,7 @@ export function RoomView() {
 
       {!loading && entries.length === 0 && !error ? (
         <div className="flex flex-col items-start gap-3 py-8">
-          <p className="text-sm text-ink-soft">{filtered ? t('emptyFiltered') : t('empty')}</p>
+          <p className="text-sm text-muted">{filtered ? t('emptyFiltered') : t('empty')}</p>
           {!filtered && (
             <Link href="/room/add" className={primaryButton}>
               + {t('addFirst')}
@@ -253,12 +220,16 @@ export function RoomView() {
         </div>
       ) : (
         <>
-          {filtered && <p className="-mt-4 text-xs text-ink-soft">{t('resultCount', { count: totalItems })}</p>}
-          {layout === 'TIDY' ? <TidyShelves entries={entries} /> : <ScatteredRoom entries={entries} />}
+          {filtered && <p className="-mt-4 text-xs text-muted">{t('resultCount', { count: totalItems })}</p>}
+          <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-4 lg:grid-cols-6">
+            {entries.map((entry) => (
+              <MediaCard key={entry.id} entry={entry} />
+            ))}
+          </div>
         </>
       )}
 
-      {loading && <p className="text-sm text-ink-soft">{t('loading')}</p>}
+      {loading && <p className="text-sm text-muted">{t('loading')}</p>}
       {!loading && page + 1 < totalPages && (
         <button onClick={() => load(page + 1)} className={`${secondaryButton} self-center`}>
           {t('loadMore')}
@@ -276,8 +247,8 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       aria-pressed={active}
       className={
         active
-          ? 'rounded-full bg-teal px-3 py-1 text-sm text-paper'
-          : 'rounded-full border border-line px-3 py-1 text-sm text-ink-soft transition-colors hover:border-teal hover:text-teal'
+          ? 'rounded-card border border-amber bg-amber px-3 py-1 text-sm font-bold text-on-amber shadow-pixel'
+          : 'rounded-card border border-edge bg-surface px-3 py-1 text-sm text-muted transition-colors hover:border-amber hover:text-amber'
       }
     >
       {children}
@@ -293,8 +264,8 @@ function TabLink({ active, onClick, children }: { active: boolean; onClick: () =
       aria-pressed={active}
       className={
         active
-          ? 'border-b-2 border-teal pb-0.5 font-medium text-teal'
-          : 'border-b-2 border-transparent pb-0.5 text-ink-soft hover:text-ink'
+          ? 'border-b-2 border-amber pb-0.5 font-medium text-amber'
+          : 'border-b-2 border-transparent pb-0.5 text-muted hover:text-parchment'
       }
     >
       {children}

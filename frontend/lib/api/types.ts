@@ -2,8 +2,6 @@
 
 export type MediaType = 'BOOK' | 'MOVIE' | 'TV' | 'ANIME';
 export type EntryStatus = 'WANT' | 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED';
-/** 兩扇門：TIDY 整齊書架、ARTISTIC 散落書房 */
-export type LayoutStyle = 'TIDY' | 'ARTISTIC';
 
 export const MEDIA_TYPES: MediaType[] = ['BOOK', 'MOVIE', 'TV', 'ANIME'];
 export const ENTRY_STATUSES: EntryStatus[] = ['WANT', 'IN_PROGRESS', 'COMPLETED', 'ABANDONED'];
@@ -19,8 +17,6 @@ export type Room = {
   intro: string | null;
   quoteText: string | null;
   quoteSource: string | null;
-  /** null = 還沒選過門 */
-  layoutStyle: LayoutStyle | null;
   isPublic: boolean;
   updatedAt: string;
 };
