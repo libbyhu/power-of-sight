@@ -8,5 +8,4 @@ public record UpdateRoomRequest(
         @NotBlank @Size(max = 60) String name,
         @Size(max = 500) String intro,
         @Size(max = 200) String quoteText,
-        @Size(max = 100) String quoteSource) {
-}
+        @Size(max = 100) String quoteSource) {}

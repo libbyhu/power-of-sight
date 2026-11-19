@@ -62,7 +62,12 @@ export function RoomEditor() {
         quoteText: draft.quoteText.trim() || null,
         quoteSource: draft.quoteSource.trim() || null,
       });
-      const d = { name: room.name, intro: room.intro ?? '', quoteText: room.quoteText ?? '', quoteSource: room.quoteSource ?? '' };
+      const d = {
+        name: room.name,
+        intro: room.intro ?? '',
+        quoteText: room.quoteText ?? '',
+        quoteSource: room.quoteSource ?? '',
+      };
       setDraft(d);
       setSaved(d);
       setMessage({ tone: 'ok', text: t('saved') });

@@ -41,7 +41,15 @@ export function NavBar({ signedIn }: { signedIn: boolean }) {
         <div className="flex items-center gap-4">
           {signedIn ? (
             <Link href="/settings" aria-label={t('settings')} className="text-muted hover:text-parchment">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                aria-hidden
+              >
                 <circle cx="12" cy="8" r="3.5" />
                 <path d="M4.5 20c1.4-3.6 4.4-5.5 7.5-5.5s6.1 1.9 7.5 5.5" strokeLinecap="round" />
               </svg>
@@ -72,7 +80,9 @@ function NavLink({ href, label, active, small }: { href: string; label: string; 
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={active ? `${size} font-medium text-amber` : `${size} text-muted transition-colors hover:text-parchment`}
+      className={
+        active ? `${size} font-medium text-amber` : `${size} text-muted transition-colors hover:text-parchment`
+      }
     >
       {label}
     </Link>

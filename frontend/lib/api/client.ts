@@ -44,8 +44,7 @@ async function request<T>(path: string, { method = 'GET', json }: RequestOptions
 export const authApi = {
   register: (body: { email: string; password: string; displayName: string }) =>
     request<User>('/auth/register', { method: 'POST', json: body }),
-  login: (body: { email: string; password: string }) =>
-    request<User>('/auth/login', { method: 'POST', json: body }),
+  login: (body: { email: string; password: string }) => request<User>('/auth/login', { method: 'POST', json: body }),
   logout: () => request<void>('/auth/logout', { method: 'POST' }),
   me: () => request<User>('/auth/me'),
 };

@@ -20,7 +20,8 @@ class RoomApiTest extends ApiTestSupport {
                 .andExpect(jsonPath("$.name").value("Alice的書房"))
                 .andExpect(jsonPath("$.isPublic").value(false));
 
-        mvc.perform(withJson(putAs(alice, "/api/me/room"),
+        mvc.perform(withJson(
+                        putAs(alice, "/api/me/room"),
                         Map.of("name", "月光書房", "intro", "書和電影放在一起", "quoteText", "進入眼中的一切")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("月光書房"))

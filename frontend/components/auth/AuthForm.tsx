@@ -41,7 +41,9 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
       window.location.assign(safeNext(searchParams.get('next'), locale));
     } catch (err) {
       if (err instanceof ApiError && err.fields) {
-        setFieldErrors(Object.fromEntries(Object.keys(err.fields).map((k) => [k, t(`invalid.${k}` as 'invalid.email')])));
+        setFieldErrors(
+          Object.fromEntries(Object.keys(err.fields).map((k) => [k, t(`invalid.${k}` as 'invalid.email')])),
+        );
       }
       setError(toMessage(err));
       setSubmitting(false);
@@ -78,7 +80,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
         />
       </Field>
 
-      <Field label={t('password')} hint={mode === 'register' ? t('passwordHint') : undefined} error={fieldErrors.password}>
+      <Field
+        label={t('password')}
+        hint={mode === 'register' ? t('passwordHint') : undefined}
+        error={fieldErrors.password}
+      >
         <input
           type="password"
           value={password}

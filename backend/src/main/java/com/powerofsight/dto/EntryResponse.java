@@ -25,8 +25,20 @@ public record EntryResponse(
 
     public static EntryResponse from(Entry e) {
         var m = e.getMedia();
-        return new EntryResponse(e.getId(), m.getType(), m.getTitle(), m.getOriginalTitle(), m.getCreator(),
-                m.getReleaseYear(), m.getCoverUrl(), e.getStatus(), e.getPreference(), e.getReview(),
-                e.getCompletedOn(), e.getVersion(), e.getCreatedAt(), e.getUpdatedAt());
+        return new EntryResponse(
+                e.getId(),
+                m.getType(),
+                m.getTitle(),
+                m.getOriginalTitle(),
+                m.getCreator(),
+                m.getReleaseYear(),
+                m.getCoverUrl(),
+                e.getStatus(),
+                e.getPreference(),
+                e.getReview(),
+                e.getCompletedOn(),
+                e.getVersion(),
+                e.getCreatedAt(),
+                e.getUpdatedAt());
     }
 }

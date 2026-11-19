@@ -92,15 +92,27 @@ export function EntryDetail({ id }: { id: string }) {
               {confirmDelete ? (
                 <>
                   <span className="text-sm text-muted">{t('deleteConfirm')}</span>
-                  <button type="button" onClick={handleDelete} className="rounded-card bg-heart px-3 py-1.5 text-sm text-on-amber">
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="rounded-card bg-heart px-3 py-1.5 text-sm text-on-amber"
+                  >
                     {t('deleteYes')}
                   </button>
-                  <button type="button" onClick={() => setConfirmDelete(false)} className="text-sm text-muted hover:text-parchment">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(false)}
+                    className="text-sm text-muted hover:text-parchment"
+                  >
                     {t('deleteNo')}
                   </button>
                 </>
               ) : (
-                <button type="button" onClick={() => setConfirmDelete(true)} className="text-sm text-muted hover:text-heart">
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="text-sm text-muted hover:text-heart"
+                >
                   {t('delete')}
                 </button>
               )}

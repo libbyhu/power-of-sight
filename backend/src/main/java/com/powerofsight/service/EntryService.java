@@ -41,12 +41,15 @@ public class EntryService {
     }
 
     /** 列表排序：RECENT = 最新放的在前；TITLE = 依種類、再依名稱排列。 */
-    public enum ListSort { RECENT, TITLE }
+    public enum ListSort {
+        RECENT,
+        TITLE
+    }
 
     /** 所有種類混在一起列出；種類、狀態、關鍵字都只是選填的篩選。 */
     @Transactional(readOnly = true)
-    public PageResponse<EntryResponse> list(UUID ownerId, MediaType type, EntryStatus status,
-                                            String keyword, ListSort sort, int page, int size) {
+    public PageResponse<EntryResponse> list(
+            UUID ownerId, MediaType type, EntryStatus status, String keyword, ListSort sort, int page, int size) {
         var spec = ownedBy(ownerId).and(hasType(type)).and(hasStatus(status)).and(matches(keyword));
         Sort order = sort == ListSort.TITLE
                 ? Sort.by("media.type", "media.title", "id")
@@ -81,8 +84,8 @@ public class EntryService {
         }
         Entry entry = findOwn(ownerId, entryId);
         if (entry.getVersion() != request.version()) {
-            throw new ApiException(HttpStatus.CONFLICT, "VERSION_CONFLICT",
-                    "This entry was changed elsewhere. Reload and try again.");
+            throw new ApiException(
+                    HttpStatus.CONFLICT, "VERSION_CONFLICT", "This entry was changed elsewhere. Reload and try again.");
         }
         MediaItem media = entry.getMedia();
         // 目前作品資料都是自己建立的；之後開放共用作品時，別人建立的作品不能從這裡修改

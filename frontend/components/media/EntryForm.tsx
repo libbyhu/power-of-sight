@@ -4,7 +4,14 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ApiError } from '@/lib/api/client';
 import { useApiError } from '@/lib/api/useApiError';
-import { ENTRY_STATUSES, MEDIA_TYPES, type Entry, type EntryInput, type EntryStatus, type MediaType } from '@/lib/api/types';
+import {
+  ENTRY_STATUSES,
+  MEDIA_TYPES,
+  type Entry,
+  type EntryInput,
+  type EntryStatus,
+  type MediaType,
+} from '@/lib/api/types';
 import { Field, FormMessage, inputClass, primaryButton } from '@/components/ui/Field';
 import { HeartPreferencePicker } from './HeartPreferencePicker';
 
@@ -135,13 +142,29 @@ export function EntryForm({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label={t('title')} error={fieldErrors.title}>
-          <input value={draft.title} onChange={(e) => set('title', e.target.value)} maxLength={200} className={inputClass} required />
+          <input
+            value={draft.title}
+            onChange={(e) => set('title', e.target.value)}
+            maxLength={200}
+            className={inputClass}
+            required
+          />
         </Field>
         <Field label={t('originalTitle')} hint={t('optional')}>
-          <input value={draft.originalTitle} onChange={(e) => set('originalTitle', e.target.value)} maxLength={200} className={inputClass} />
+          <input
+            value={draft.originalTitle}
+            onChange={(e) => set('originalTitle', e.target.value)}
+            maxLength={200}
+            className={inputClass}
+          />
         </Field>
         <Field label={t(`creator.${draft.type}`)} hint={t('optional')}>
-          <input value={draft.creator} onChange={(e) => set('creator', e.target.value)} maxLength={120} className={inputClass} />
+          <input
+            value={draft.creator}
+            onChange={(e) => set('creator', e.target.value)}
+            maxLength={120}
+            className={inputClass}
+          />
         </Field>
         <Field label={t('releaseYear')} hint={t('optional')} error={fieldErrors.releaseYear}>
           <input
@@ -186,7 +209,11 @@ export function EntryForm({
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label={t('status')}>
-            <select value={draft.status} onChange={(e) => set('status', e.target.value as Draft['status'])} className={inputClass}>
+            <select
+              value={draft.status}
+              onChange={(e) => set('status', e.target.value as Draft['status'])}
+              className={inputClass}
+            >
               <option value="">{t('statusNone')}</option>
               {ENTRY_STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -211,7 +238,11 @@ export function EntryForm({
         <div className="flex flex-col gap-2">
           <FormMessage tone="error">{error}</FormMessage>
           {conflict && (
-            <button type="button" onClick={() => window.location.reload()} className="w-fit text-sm text-amber underline">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="w-fit text-sm text-amber underline"
+            >
               {t('reload')}
             </button>
           )}
