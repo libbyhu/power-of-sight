@@ -1,0 +1,13 @@
+{
+  "name": "用眼睛發力 · Power of Sight",
+  "short_name": "Power of Sight",
+  "description": "A personal library for everything you have read and watched.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F6EFDF",
+  "theme_color": "#3B5941",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
