@@ -37,31 +37,37 @@ class EntryApiTest extends ApiTestSupport {
         addEntry(alice, Map.of("type", "BOOK", "title", "百年孤寂", "status", "WANT"));
         addEntry(alice, Map.of("type", "MOVIE", "title", "神隱少女", "creator", "宮崎駿", "status", "WANT"));
 
-        mvc.perform(getAs(alice, "/api/me/entries?type=BOOK")).andExpect(jsonPath("$.totalItems").value(2));
-        mvc.perform(getAs(alice, "/api/me/entries?status=WANT")).andExpect(jsonPath("$.totalItems").value(2));
-        mvc.perform(getAs(alice, "/api/me/entries?type=BOOK&status=WANT")).andExpect(jsonPath("$.totalItems").value(1));
+        mvc.perform(getAs(alice, "/api/me/entries?type=BOOK"))
+                .andExpect(jsonPath("$.totalItems").value(2));
+        mvc.perform(getAs(alice, "/api/me/entries?status=WANT"))
+                .andExpect(jsonPath("$.totalItems").value(2));
+        mvc.perform(getAs(alice, "/api/me/entries?type=BOOK&status=WANT"))
+                .andExpect(jsonPath("$.totalItems").value(1));
         mvc.perform(getAs(alice, "/api/me/entries?q=村上"))
                 .andExpect(jsonPath("$.totalItems").value(1))
                 .andExpect(jsonPath("$.items[0].title").value("挪威的森林"));
         // % 是一般文字，不是「全部符合」
-        mvc.perform(getAs(alice, "/api/me/entries?q=%25")).andExpect(jsonPath("$.totalItems").value(0));
+        mvc.perform(getAs(alice, "/api/me/entries?q=%25"))
+                .andExpect(jsonPath("$.totalItems").value(0));
     }
 
     @Test
     @DisplayName("欄位驗證：不明種類、心得超過 300 字、偷塞 ownerId 都會被拒絕")
     void validation() throws Exception {
         Cookie alice = register("alice@example.com", "Alice");
-        mvc.perform(withJson(post("/api/me/entries"), Map.of("type", "GAME", "title", "x")).cookie(alice))
+        mvc.perform(withJson(post("/api/me/entries"), Map.of("type", "GAME", "title", "x"))
+                        .cookie(alice))
                 .andExpect(status().isBadRequest());
-        mvc.perform(withJson(post("/api/me/entries"),
-                        Map.of("type", "BOOK", "title", "x", "review", "字".repeat(301))).cookie(alice))
+        mvc.perform(withJson(post("/api/me/entries"), Map.of("type", "BOOK", "title", "x", "review", "字".repeat(301)))
+                        .cookie(alice))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fields.review").exists());
-        mvc.perform(withJson(post("/api/me/entries"),
-                        Map.of("type", "BOOK", "title", "x", "preference", 6)).cookie(alice))
+        mvc.perform(withJson(post("/api/me/entries"), Map.of("type", "BOOK", "title", "x", "preference", 6))
+                        .cookie(alice))
                 .andExpect(status().isBadRequest());
-        mvc.perform(withJson(post("/api/me/entries"),
-                        Map.of("type", "BOOK", "title", "x", "ownerId", "00000000-0000-0000-0000-000000000000"))
+        mvc.perform(withJson(
+                                post("/api/me/entries"),
+                                Map.of("type", "BOOK", "title", "x", "ownerId", "00000000-0000-0000-0000-000000000000"))
                         .cookie(alice))
                 .andExpect(status().isBadRequest());
     }
@@ -71,12 +77,15 @@ class EntryApiTest extends ApiTestSupport {
     void ownersAreIsolated() throws Exception {
         Cookie alice = register("alice@example.com", "Alice");
         Cookie bob = register("bob@example.com", "Bob");
-        String id = addEntry(alice, Map.of("type", "BOOK", "title", "挪威的森林")).get("id").asText();
+        String id = addEntry(alice, Map.of("type", "BOOK", "title", "挪威的森林"))
+                .get("id")
+                .asText();
 
-        mvc.perform(getAs(bob, "/api/me/entries")).andExpect(jsonPath("$.totalItems").value(0));
+        mvc.perform(getAs(bob, "/api/me/entries"))
+                .andExpect(jsonPath("$.totalItems").value(0));
         mvc.perform(getAs(bob, "/api/me/entries/" + id)).andExpect(status().isNotFound());
-        mvc.perform(withJson(putAs(bob, "/api/me/entries/" + id),
-                        Map.of("type", "BOOK", "title", "hacked", "version", 0)))
+        mvc.perform(withJson(
+                        putAs(bob, "/api/me/entries/" + id), Map.of("type", "BOOK", "title", "hacked", "version", 0)))
                 .andExpect(status().isNotFound());
         mvc.perform(deleteAs(bob, "/api/me/entries/" + id)).andExpect(status().isNotFound());
 
@@ -92,8 +101,8 @@ class EntryApiTest extends ApiTestSupport {
         JsonNode created = addEntry(alice, Map.of("type", "BOOK", "title", "挪威的森林"));
         String url = "/api/me/entries/" + created.get("id").asText();
 
-        Map<String, Object> body = new HashMap<>(Map.of("type", "BOOK", "title", "挪威的森林",
-                "status", "COMPLETED", "preference", 5, "review", "很安靜"));
+        Map<String, Object> body = new HashMap<>(
+                Map.of("type", "BOOK", "title", "挪威的森林", "status", "COMPLETED", "preference", 5, "review", "很安靜"));
         mvc.perform(withJson(putAs(alice, url), body))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VERSION_REQUIRED"));
@@ -114,7 +123,9 @@ class EntryApiTest extends ApiTestSupport {
     @DisplayName("刪除收藏時，沒人再用的作品資料也一起刪掉")
     void deleteRemovesOrphanMedia() throws Exception {
         Cookie alice = register("alice@example.com", "Alice");
-        String id = addEntry(alice, Map.of("type", "MOVIE", "title", "神隱少女")).get("id").asText();
+        String id = addEntry(alice, Map.of("type", "MOVIE", "title", "神隱少女"))
+                .get("id")
+                .asText();
         assertThat(mediaItems.count()).isEqualTo(1);
 
         mvc.perform(deleteAs(alice, "/api/me/entries/" + id)).andExpect(status().isNoContent());

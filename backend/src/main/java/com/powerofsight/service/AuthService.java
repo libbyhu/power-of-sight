@@ -57,8 +57,8 @@ public class AuthService {
     @Transactional(readOnly = true)
     public User get(UUID userId) {
         // token 還有效但帳號已不存在時，當作未登入
-        return users.findById(userId).orElseThrow(
-                () -> new ApiException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "Please sign in"));
+        return users.findById(userId)
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "Please sign in"));
     }
 
     private static String normalizeEmail(String email) {

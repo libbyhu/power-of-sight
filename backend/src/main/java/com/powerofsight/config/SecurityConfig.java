@@ -35,23 +35,24 @@ public class SecurityConfig {
         AuthenticationEntryPoint unauthorized = (request, response, e) -> {
             response.setStatus(401);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            json.writeValue(response.getOutputStream(),
-                    new ErrorResponse("UNAUTHORIZED", "Please sign in", null));
+            json.writeValue(response.getOutputStream(), new ErrorResponse("UNAUTHORIZED", "Please sign in", null));
         };
 
         return http
                 // 用 cookie + SameSite=Lax 擋跨站請求；API 只收 JSON，所以不另外用 CSRF token
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/auth/logout")
+                .authorizeHttpRequests(auth -> auth.requestMatchers(
+                                HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/auth/logout")
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth -> oauth
-                        .bearerTokenResolver(new CookieBearerTokenResolver(props.cookieName()))
-                        .authenticationEntryPoint(unauthorized)
-                        .jwt(jwt -> { }))
+                        .requestMatchers(HttpMethod.GET, "/api/health")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
+                .oauth2ResourceServer(
+                        oauth -> oauth.bearerTokenResolver(new CookieBearerTokenResolver(props.cookieName()))
+                                .authenticationEntryPoint(unauthorized)
+                                .jwt(jwt -> {}))
                 .exceptionHandling(e -> e.authenticationEntryPoint(unauthorized))
                 .build();
     }
@@ -72,8 +73,8 @@ public class SecurityConfig {
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
         // 檢查過期時間，並確認由本服務簽發
-        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
-                JwtValidators.createDefaultWithIssuer(JwtService.ISSUER)));
+        decoder.setJwtValidator(
+                new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefaultWithIssuer(JwtService.ISSUER)));
         return decoder;
     }
 

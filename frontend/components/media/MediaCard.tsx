@@ -13,7 +13,7 @@ export function MediaCard({ entry }: { entry: Entry }) {
   return (
     <Link
       href={`/room/${entry.id}`}
-      className="group flex flex-col gap-2 rounded-card border border-edge border-b-4 border-b-wood bg-surface p-2 transition-colors hover:border-amber hover:border-b-wood"
+      className="group flex flex-col gap-2 rounded-card border border-b-4 border-edge border-b-wood bg-surface p-2 transition-colors hover:border-amber hover:border-b-wood"
     >
       <Cover url={entry.coverUrl} title={entry.title} type={entry.type} />
 

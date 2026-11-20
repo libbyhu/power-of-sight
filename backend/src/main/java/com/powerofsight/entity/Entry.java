@@ -55,8 +55,7 @@ public class Entry {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    protected Entry() {
-    }
+    protected Entry() {}
 
     public Entry(UUID ownerId, MediaItem media, long displayOrder) {
         this.id = UUID.randomUUID();
@@ -72,20 +71,63 @@ public class Entry {
         this.updatedAt = OffsetDateTime.now();
     }
 
-    public UUID getId() { return id; }
-    public UUID getOwnerId() { return ownerId; }
-    public MediaItem getMedia() { return media; }
-    public EntryStatus getStatus() { return status; }
-    public Integer getPreference() { return preference; }
-    public String getReview() { return review; }
-    public LocalDate getCompletedOn() { return completedOn; }
-    public long getDisplayOrder() { return displayOrder; }
-    public long getVersion() { return version; }
-    public OffsetDateTime getCreatedAt() { return createdAt; }
-    public OffsetDateTime getUpdatedAt() { return updatedAt; }
+    public UUID getId() {
+        return id;
+    }
 
-    public void setStatus(EntryStatus status) { this.status = status; }
-    public void setPreference(Integer preference) { this.preference = preference; }
-    public void setReview(String review) { this.review = review; }
-    public void setCompletedOn(LocalDate completedOn) { this.completedOn = completedOn; }
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public MediaItem getMedia() {
+        return media;
+    }
+
+    public EntryStatus getStatus() {
+        return status;
+    }
+
+    public Integer getPreference() {
+        return preference;
+    }
+
+    public String getReview() {
+        return review;
+    }
+
+    public LocalDate getCompletedOn() {
+        return completedOn;
+    }
+
+    public long getDisplayOrder() {
+        return displayOrder;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setStatus(EntryStatus status) {
+        this.status = status;
+    }
+
+    public void setPreference(Integer preference) {
+        this.preference = preference;
+    }
+
+    public void setReview(String review) {
+        this.review = review;
+    }
+
+    public void setCompletedOn(LocalDate completedOn) {
+        this.completedOn = completedOn;
+    }
 }

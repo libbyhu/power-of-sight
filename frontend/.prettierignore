@@ -1,0 +1,6 @@
+# 逐像素定位的繪圖程式，保留原本的排版
+lib/castle/castle.js
+
+.next/
+node_modules/
+package-lock.json

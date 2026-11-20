@@ -12,15 +12,15 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public final class EntrySpecifications {
 
-    private EntrySpecifications() {
-    }
+    private EntrySpecifications() {}
 
     public static Specification<Entry> ownedBy(UUID ownerId) {
         return (root, query, cb) -> cb.equal(root.get("ownerId"), ownerId);
     }
 
     public static Specification<Entry> hasType(MediaType type) {
-        return (root, query, cb) -> type == null ? null : cb.equal(root.get("media").get("type"), type);
+        return (root, query, cb) ->
+                type == null ? null : cb.equal(root.get("media").get("type"), type);
     }
 
     public static Specification<Entry> hasStatus(EntryStatus status) {

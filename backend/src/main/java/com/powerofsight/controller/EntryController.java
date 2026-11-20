@@ -57,15 +57,16 @@ public class EntryController {
     }
 
     @PostMapping
-    public ResponseEntity<EntryResponse> create(@AuthenticationPrincipal Jwt jwt,
-                                                @Valid @RequestBody EntryRequest request) {
+    public ResponseEntity<EntryResponse> create(
+            @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody EntryRequest request) {
         EntryResponse created = entryService.create(CurrentUser.id(jwt), request);
-        return ResponseEntity.created(URI.create("/api/me/entries/" + created.id())).body(created);
+        return ResponseEntity.created(URI.create("/api/me/entries/" + created.id()))
+                .body(created);
     }
 
     @PutMapping("/{id}")
-    public EntryResponse update(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id,
-                                @Valid @RequestBody EntryRequest request) {
+    public EntryResponse update(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, @Valid @RequestBody EntryRequest request) {
         return entryService.update(CurrentUser.id(jwt), id, request);
     }
 

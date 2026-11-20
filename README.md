@@ -1,5 +1,7 @@
 # 用眼睛發力 · Power of Sight
 
+[![CI](https://github.com/libbyhu/power-of-sight/actions/workflows/ci.yml/badge.svg)](https://github.com/libbyhu/power-of-sight/actions/workflows/ci.yml)
+
 > 一間屬於你的魔法書房：書、電影、影集、動漫都可以自在地放在一起。
 > *A personal room for everything you've read and watched — no sorting required.*
 
@@ -19,7 +21,7 @@
 | 後端 | Spring Boot 3.5、Java 21、Spring Security、Spring Data JPA、Flyway |
 | 登入 | Email + 密碼（BCrypt），後端簽發 JWT，放在 httpOnly cookie |
 | 資料庫 | 本機 H2（免安裝）；正式環境 PostgreSQL（`docker-compose.yml`） |
-| 測試 | JUnit 5 + MockMvc 整合測試（19 項） |
+| 測試 | JUnit 5 + MockMvc 整合測試（17 項） |
 
 ```
 瀏覽器 ──► Next.js (:3000) ──/api/*──► Spring Boot (:8080) ──► H2 / PostgreSQL
@@ -58,6 +60,15 @@ cd backend
 .\mvnw.cmd test
 ```
 
+**提交前的格式檢查**
+
+```powershell
+cd frontend; npm run format; npm run lint
+cd ../backend; .\mvnw.cmd spotless:apply
+```
+
+命名、commit 訊息與分支規則見 [開發規範](docs/00-開發規範.md)。推送後 GitHub Actions 會自動執行格式檢查、測試與建置。
+
 ## 專案結構
 
 ```
@@ -88,7 +99,7 @@ docs/                    設計文件
 - **不強迫分類**：資料表只有一個 `type` 欄位，用來決定「作者／導演」怎麼稱呼，不建立主題頻道。
 - **程式繪製的像素場景**：開場動畫與首頁主視覺共用同一個繪圖模組（`frontend/lib/castle`），第一次造訪自動播放，可跳過、可重播，並尊重系統的「減少動態效果」設定。
 
-更多細節：[架構](docs/01-架構與技術選型.md) · [資料庫](docs/02-資料庫設計.md) · [API](docs/03-API規格.md) · [進度與規劃](docs/04-進度與規劃.md) · [上線路線圖](docs/05-上線路線圖.md)
+更多細節：[開發規範](docs/00-開發規範.md) · [架構](docs/01-架構與技術選型.md) · [資料庫](docs/02-資料庫設計.md) · [API](docs/03-API規格.md) · [進度與規劃](docs/04-進度與規劃.md) · [上線路線圖](docs/05-上線路線圖.md)
 
 ## 版本沿革
 

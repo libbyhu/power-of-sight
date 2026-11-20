@@ -29,12 +29,23 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ActiveProfiles("test")
 abstract class ApiTestSupport {
 
-    @Autowired MockMvc mvc;
-    @Autowired ObjectMapper json;
-    @Autowired UserRepository users;
-    @Autowired RoomRepository rooms;
-    @Autowired EntryRepository entries;
-    @Autowired MediaItemRepository mediaItems;
+    @Autowired
+    MockMvc mvc;
+
+    @Autowired
+    ObjectMapper json;
+
+    @Autowired
+    UserRepository users;
+
+    @Autowired
+    RoomRepository rooms;
+
+    @Autowired
+    EntryRepository entries;
+
+    @Autowired
+    MediaItemRepository mediaItems;
 
     @BeforeEach
     void cleanDatabase() {
@@ -46,19 +57,23 @@ abstract class ApiTestSupport {
 
     /** 註冊一位會員，回傳登入 cookie。 */
     Cookie register(String email, String displayName) throws Exception {
-        MvcResult result = mvc.perform(withJson(post("/api/auth/register"),
+        MvcResult result = mvc.perform(withJson(
+                        post("/api/auth/register"),
                         Map.of("email", email, "password", "password123", "displayName", displayName)))
                 .andReturn();
         if (result.getResponse().getStatus() != 201) {
-            throw new IllegalStateException("register failed: " + result.getResponse().getContentAsString());
+            throw new IllegalStateException(
+                    "register failed: " + result.getResponse().getContentAsString());
         }
         return result.getResponse().getCookie("pos_token");
     }
 
     JsonNode addEntry(Cookie cookie, Map<String, ?> body) throws Exception {
-        MvcResult result = mvc.perform(withJson(post("/api/me/entries"), body).cookie(cookie)).andReturn();
+        MvcResult result = mvc.perform(withJson(post("/api/me/entries"), body).cookie(cookie))
+                .andReturn();
         if (result.getResponse().getStatus() != 201) {
-            throw new IllegalStateException("add failed: " + result.getResponse().getContentAsString());
+            throw new IllegalStateException(
+                    "add failed: " + result.getResponse().getContentAsString());
         }
         return json.readTree(result.getResponse().getContentAsString());
     }

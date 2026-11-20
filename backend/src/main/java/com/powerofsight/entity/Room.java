@@ -40,8 +40,7 @@ public class Room {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    protected Room() {
-    }
+    protected Room() {}
 
     public Room(UUID ownerId, String name) {
         this.id = UUID.randomUUID();
@@ -57,17 +56,51 @@ public class Room {
         this.updatedAt = OffsetDateTime.now();
     }
 
-    public UUID getId() { return id; }
-    public UUID getOwnerId() { return ownerId; }
-    public String getName() { return name; }
-    public String getIntro() { return intro; }
-    public String getQuoteText() { return quoteText; }
-    public String getQuoteSource() { return quoteSource; }
-    public boolean isPublic() { return isPublic; }
-    public OffsetDateTime getUpdatedAt() { return updatedAt; }
+    public UUID getId() {
+        return id;
+    }
 
-    public void setName(String name) { this.name = name; }
-    public void setIntro(String intro) { this.intro = intro; }
-    public void setQuoteText(String quoteText) { this.quoteText = quoteText; }
-    public void setQuoteSource(String quoteSource) { this.quoteSource = quoteSource; }
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getIntro() {
+        return intro;
+    }
+
+    public String getQuoteText() {
+        return quoteText;
+    }
+
+    public String getQuoteSource() {
+        return quoteSource;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro;
+    }
+
+    public void setQuoteText(String quoteText) {
+        this.quoteText = quoteText;
+    }
+
+    public void setQuoteSource(String quoteSource) {
+        this.quoteSource = quoteSource;
+    }
 }

@@ -6,8 +6,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
@@ -22,10 +22,10 @@ public record EntryRequest(
         @Size(max = 200) String originalTitle,
         @Size(max = 120) String creator,
         @Min(1000) @Max(3000) Integer releaseYear,
-        @Size(max = 500) @Pattern(regexp = "^https?://.*", message = "must start with http:// or https://") String coverUrl,
+        @Size(max = 500) @Pattern(regexp = "^https?://.*", message = "must start with http:// or https://")
+                String coverUrl,
         EntryStatus status,
         @Min(1) @Max(5) Integer preference,
         @Size(max = 300) String review,
         @PastOrPresent LocalDate completedOn,
-        @PositiveOrZero Long version) {
-}
+        @PositiveOrZero Long version) {}

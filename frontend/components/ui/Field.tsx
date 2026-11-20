@@ -33,7 +33,10 @@ export function Field({
 
 export function FormMessage({ tone, children }: { tone: 'error' | 'ok'; children: React.ReactNode }) {
   return (
-    <p role={tone === 'error' ? 'alert' : 'status'} className={tone === 'error' ? 'text-sm text-heart' : 'text-sm text-amber'}>
+    <p
+      role={tone === 'error' ? 'alert' : 'status'}
+      className={tone === 'error' ? 'text-sm text-heart' : 'text-sm text-amber'}
+    >
       {children}
     </p>
   );

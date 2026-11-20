@@ -1,6 +1,7 @@
 package com.powerofsight.exception;
 
 import com.powerofsight.dto.ErrorResponse;
+import jakarta.validation.ConstraintViolationException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /** 把各種錯誤統一整理成 { code, message, fields } 的格式回給前端。 */
@@ -33,14 +33,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
         Map<String, String> fields = new LinkedHashMap<>();
-        e.getBindingResult().getFieldErrors()
+        e.getBindingResult()
+                .getFieldErrors()
                 .forEach(err -> fields.putIfAbsent(err.getField(), err.getDefaultMessage()));
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse("VALIDATION_FAILED", "Some fields are invalid", fields));
     }
 
-    @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class,
-            HandlerMethodValidationException.class, ConstraintViolationException.class})
+    @ExceptionHandler({
+        HttpMessageNotReadableException.class,
+        MethodArgumentTypeMismatchException.class,
+        HandlerMethodValidationException.class,
+        ConstraintViolationException.class
+    })
     ResponseEntity<ErrorResponse> handleBadInput(Exception e) {
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse("BAD_REQUEST", "Request body or parameter is malformed", null));
@@ -50,7 +55,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
     ResponseEntity<ErrorResponse> handleOptimisticLock(ObjectOptimisticLockingFailureException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse("VERSION_CONFLICT", "This entry was changed elsewhere. Reload and try again.", null));
+                .body(new ErrorResponse(
+                        "VERSION_CONFLICT", "This entry was changed elsewhere. Reload and try again.", null));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
