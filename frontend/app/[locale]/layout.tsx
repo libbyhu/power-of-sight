@@ -22,19 +22,21 @@ export function generateStaticParams() {
 
 export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   const messages = await getMessages();
+  const signedIn = await hasSessionCookie();
 
   return (
     <html lang={locale}>
       <body className="min-h-screen bg-night font-sans text-parchment antialiased">
         <NextIntlClientProvider messages={messages}>
           <div className="mx-auto flex min-h-screen max-w-6xl flex-col">
-            <NavBar signedIn={hasSessionCookie()} />
+            <NavBar signedIn={signedIn} />
             <main className="flex-1 px-5 py-8 sm:px-8">{children}</main>
           </div>
         </NextIntlClientProvider>
