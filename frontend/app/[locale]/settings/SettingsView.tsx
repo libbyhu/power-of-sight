@@ -21,6 +21,7 @@ export function SettingsView() {
 
   async function handleLogout() {
     await authApi.logout().catch(() => undefined);
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- 登出後整頁重新載入，讓導覽列依 cookie 重新顯示
     window.location.assign(`/${locale}`);
   }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
 import { drawCastle } from '@/lib/castle/castle';
 
@@ -36,6 +36,19 @@ function markIntroSeen() {
  * - 播放中可按「跳過動畫」或 Esc。
  * 全螢幕與隱藏頁面內容由 body 上的 intro-playing class 控制（樣式在 globals.css）。
  */
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+// 「減少動態效果」設定來自瀏覽器，用 useSyncExternalStore 訂閱；伺服器端沒有這個設定，先當作 false
+function subscribeReducedMotion(onChange: () => void) {
+  const query = window.matchMedia(REDUCED_MOTION_QUERY);
+  query.addEventListener('change', onChange);
+  return () => query.removeEventListener('change', onChange);
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
+}
+
 export function CastleIntro() {
   const t = useTranslations('intro');
   const stageRef = useRef<HTMLDivElement>(null);
@@ -46,7 +59,7 @@ export function CastleIntro() {
   const playingRef = useRef(false);
   const settlingRef = useRef(false);
   const [playing, setPlaying] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = useSyncExternalStore(subscribeReducedMotion, prefersReducedMotion, () => false);
 
   const drawStill = useCallback(() => {
     const context = canvasRef.current?.getContext('2d');
@@ -126,12 +139,10 @@ export function CastleIntro() {
 
   // 第一次進來：沒看過、也沒開「減少動態效果」才自動播放
   useEffect(() => {
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(motionQuery.matches);
+    const motionQuery = window.matchMedia(REDUCED_MOTION_QUERY);
     drawStill();
     if (!motionQuery.matches && !hasSeenIntro()) play();
     const onMotionChange = (e: MediaQueryListEvent) => {
-      setReducedMotion(e.matches);
       if (e.matches) finish();
     };
     const onKey = (e: KeyboardEvent) => {

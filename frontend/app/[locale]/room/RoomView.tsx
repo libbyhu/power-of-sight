@@ -60,6 +60,14 @@ export function RoomView() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState(q);
 
+  // 網址的 q 被別的地方改掉（例如按導覽列）時，搜尋框跟著更新。
+  // 在 render 時比對上一次的 q，不用 effect，避免多一次重新渲染。
+  const [syncedQ, setSyncedQ] = useState(q);
+  if (q !== syncedQ) {
+    setSyncedQ(q);
+    setSearch(q);
+  }
+
   // 書房名稱、介紹、統計：進來時讀一次
   useEffect(() => {
     Promise.all([roomApi.get(), roomApi.stats()])
@@ -97,13 +105,9 @@ export function RoomView() {
 
   // 篩選條件改變 → 從第一頁重新讀
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 向後端讀資料前先顯示載入中；過期的回應由 requestId 排除
     load(0);
   }, [load]);
-
-  // 網址的 q 被別的地方改掉（例如按導覽列）時，搜尋框跟著更新
-  useEffect(() => {
-    setSearch(q);
-  }, [q]);
 
   // 搜尋框停止輸入 0.3 秒後才更新網址，不要每打一個字就查一次
   useEffect(() => {
