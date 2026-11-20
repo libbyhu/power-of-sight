@@ -17,7 +17,7 @@
 
 | 層 | 使用 |
 |---|---|
-| 前端 | Next.js 14（App Router）、React 18、TypeScript、Tailwind CSS、next-intl（繁中 / English） |
+| 前端 | Next.js 16（App Router）、React 19、TypeScript、Tailwind CSS、next-intl（繁中 / English） |
 | 後端 | Spring Boot 3.5、Java 21、Spring Security、Spring Data JPA、Flyway |
 | 登入 | Email + 密碼（BCrypt），後端簽發 JWT，放在 httpOnly cookie |
 | 資料庫 | 本機 H2（免安裝）；正式環境 PostgreSQL（`docker-compose.yml`） |
@@ -32,7 +32,7 @@
 
 ## 在自己電腦上跑起來
 
-需要：**JDK 21**、**Node.js 20 以上**。
+需要：**JDK 21**、**Node.js 24 以上**。
 
 **1. 啟動後端**（第一個終端機）
 

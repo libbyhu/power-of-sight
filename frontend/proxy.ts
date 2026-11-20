@@ -7,7 +7,7 @@ const handleI18nRouting = createIntlMiddleware(routing);
 // 需要登入才能看的頁面
 const PROTECTED = /^\/(zh-TW|en)\/(room|settings)(\/|$)/;
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 這裡只檢查「有沒有登入 cookie」，讓沒登入的人直接被帶到登入頁。

@@ -11,6 +11,7 @@ export function useSignedOutRedirect() {
     (error: unknown) => {
       if (error instanceof ApiError && error.status === 401) {
         const next = window.location.pathname + window.location.search;
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- 整頁重新載入，讓伺服器端重新讀取登入 cookie
         window.location.assign(`/${locale}/login?next=${encodeURIComponent(next)}`);
         return true;
       }

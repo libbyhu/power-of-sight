@@ -1,5 +1,6 @@
 import { EntryDetail } from './EntryDetail';
 
-export default function EntryPage({ params }: { params: { id: string } }) {
-  return <EntryDetail id={params.id} />;
+export default async function EntryPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <EntryDetail id={id} />;
 }

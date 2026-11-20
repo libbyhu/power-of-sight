@@ -6,7 +6,7 @@ import { Eyebrow, primaryButton, secondaryButton } from '@/components/ui/Field';
 
 export default async function HomePage() {
   const t = await getTranslations('home');
-  const signedIn = hasSessionCookie();
+  const signedIn = await hasSessionCookie();
 
   return (
     <div className="flex flex-col gap-14 pb-10">
