@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: pos
       POSTGRES_PASSWORD: pos-local-password
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432" # 只接受本機連線
     volumes:
       - pos-db:/var/lib/postgresql/data
 volumes:
