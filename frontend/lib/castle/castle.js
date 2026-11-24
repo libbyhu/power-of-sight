@@ -10,6 +10,7 @@ const Castle = (() => {
   };
   let ctx;
   let setBuffer;
+  let shadowBuffer;
   const rect = (x,y,w,h,c) => { ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),w,h); };
   function poly(points,c) {
     ctx.fillStyle=c;
@@ -29,6 +30,41 @@ const Castle = (() => {
     const g=ctx.createRadialGradient(x,y,0,x,y,r);
     g.addColorStop(0,color); g.addColorStop(1,'transparent');
     ctx.fillStyle=g; ctx.fillRect(x-r,y-r,r*2,r*2);
+  }
+  function shadowLayer(paint,opacity=1) {
+    const scene=ctx;
+    if(!shadowBuffer){
+      shadowBuffer=document.createElement('canvas');
+      shadowBuffer.width=480;
+      shadowBuffer.height=270;
+    }
+    ctx=shadowBuffer.getContext('2d');
+    ctx.clearRect(0,0,480,270);
+    rect(0,0,480,270,'#07060bfc');
+    ctx.globalCompositeOperation='destination-out';
+    paint();
+    ctx.globalCompositeOperation='source-over';
+    ctx=scene;
+    ctx.save();
+    ctx.globalAlpha=opacity;
+    ctx.drawImage(shadowBuffer,0,0);
+    ctx.restore();
+  }
+  function stairLighting(t,open,x,y,dir,ease) {
+    const flicker=Math.sin(t*15+Math.sin(t*9));
+    const ahead=x+dir*24;
+    shadowLayer(()=>{
+      glow(x-dir*10,y-20,54+flicker*2,'#000000ff');
+      glow(ahead,y-10,69+flicker*2,'#000000ed');
+      glow(x,y,32,'#000000bb');
+      const near=ease(1-Math.abs(x-134)/48-Math.abs(y-181)/59);
+      if(near>0) glow(134,174,30,`rgba(0,0,0,${near*.65})`);
+      if(open>0){
+        glow(326,61,39+23*open,`rgba(0,0,0,${.32+.63*open})`);
+        glow(331,89,48,`rgba(0,0,0,${open*.7})`);
+      }
+    });
+    glow(x+dir*9,y-20,31+flicker,'#fab16a31');
   }
   function masonry(x,y,w,h,warm) {
     rect(x,y,w,h,palette.mortar);
@@ -54,20 +90,45 @@ const Castle = (() => {
     rect(x,y,w,h,'#55352f');
     for(let j=0;j<h;j+=6) {
       rect(x,y+j,w,1,'#362528');
-      for(let i=0;i<w;i+=24) {
+      rect(x,y+j+1,w,1,'#704637');
+      for(let i=(j%18)*2-22;i<w-2;i+=46) {
         const s=noise(i+j*51);
-        rect(x+i,y+j+2,Math.min(w-i,4+Math.floor(s*18)),1,s>.5?'#754636':'#624036');
+        if(i<0) continue;
+        rect(x+i,y+j+2,1,4,'#37282b');
+        rect(x+i+2,y+j+2,Math.min(w-i-2,4+Math.floor(s*18)),1,s>.5?'#805340':'#624036');
+        if(s>.66 && i+14<w){
+          rect(x+i+11,y+j+4,3,1,'#3f2a2b');
+          rect(x+i+12,y+j+5,3,1,'#70473a');
+        }
       }
+    }
+  }
+  function ornament(x,y,kind) {
+    if(kind==='vase'){
+      poly([[x+2,y],[x+7,y],[x+6,y+3],[x+9,y+5],[x+8,y+10],[x+1,y+10],[x,y+5],[x+3,y+3]],'#426360');
+      rect(x+1,y+5,2,3,'#7d9a83'); rect(x+3,y+1,4,1,'#bb9c77');
+      rect(x+2,y+7,6,1,'#bca177');
+    } else if(kind==='box'){
+      rect(x,y+3,10,7,'#74463b'); rect(x-1,y+3,12,2,'#a87049');
+      rect(x+1,y+6,8,1,'#b78853'); rect(x+4,y+5,2,3,'#e9ba72');
+    } else {
+      rect(x,y+2,8,8,'#9a704e'); rect(x+1,y+3,6,6,'#473b48');
+      poly([[x+1,y+8],[x+4,y+5],[x+7,y+8]],'#8b9ca4');
+      rect(x+5,y+4,1,1,'#f6d6a5');
     }
   }
   function shelf(x,y,w,rows,seed) {
     const h=rows*13+6;
     rect(x+2,y+3,w+2,h,'#211923'); rect(x,y,w,h,'#432923');
     rect(x+3,y+3,w-6,h-7,'#221b22');
-    const colors=['#ab654a','#7d4745','#647851','#546b7e','#b48a54','#8a6759'];
+    const colors=['#af6e4d','#843d4b','#718453','#526e87','#c09a5d','#795977'];
     for(let row=0;row<rows;row++){
       let left=x+5;
       const floor=y+15+row*13;
+      if((row+seed)%4===0 && w>32) {
+        ornament(left,floor-10,['vase','box','frame'][(seed+row*2)%3]);
+        left+=13;
+      }
       while(left<x+w-6) {
         const n=seed+left+row*45, tall=5+Math.floor(noise(n)*6);
         rect(left,floor-tall,2,tall,colors[Math.floor(noise(n+1)*6)]);
@@ -75,9 +136,11 @@ const Castle = (() => {
         left+=3+Math.floor(noise(n+2)*2);
       }
       rect(x+2,floor,w-4,2,'#86523b');
+      rect(x+3,floor+1,w-6,1,'#52332d');
     }
     rect(x-2,y-2,w+4,3,'#a46a48');
     rect(x,y+1,2,h-1,'#734535');
+    rect(x+w-3,y+2,1,h-4,'#a16a48');
   }
   function lamp(x,y,t) {
     glow(x,y,32,'#fcb05e44');
@@ -85,6 +148,15 @@ const Castle = (() => {
     rect(x-3,y-5,6,8,'#e69351'); rect(x-1,y-4,2,6,'#ffe1a0');
     rect(x-5,y+4,10,2,'#8c563e');
     if(Math.floor(t*5)%2===0) rect(x+2,y-3,1,3,'#fff0b0');
+  }
+  function candle(x,y,t) {
+    const sway=Math.round(Math.sin(t*13+x));
+    glow(x,y-4,22,'#f6a14d30');
+    rect(x-4,y+4,9,2,'#775145');
+    rect(x-1,y,3,5,'#cfa887');
+    rect(x-1,y,1,4,'#f6d4a3');
+    rect(x+sway,y-5,2,4,'#eb914c');
+    rect(x+sway,y-3,1,2,'#ffe0a0');
   }
   function beam(x,y,h) {
     rect(x-2,y,14,h,'#25202a');
@@ -94,6 +166,39 @@ const Castle = (() => {
       rect(x+3,y+i,2,7,'#674138');
       rect(x+5,y+i+4,1,8,'#63403a');
     }
+  }
+  function castShadow(x,y,w,length,lean) {
+    poly([[x,y],[x+w,y],[x+w+lean,y+length],[x+lean,y+length]],'#20182230');
+    poly([[x+1,y],[x+w-1,y],[x+w+lean*.48,y+length*.52],
+      [x+lean*.48,y+length*.52]],'#1b161d45');
+  }
+  function stonePier(x,y,w,h) {
+    rect(x,y,w,h,'#292432');
+    rect(x+2,y,w-5,h,'#44313b');
+    for(let i=0;i<h;i+=14){
+      rect(x+2,y+i,w-6,1,'#1f1a26');
+      rect(x+3,y+i+1,w-8,1,'#63454a');
+      rect(x+w-5,y+i+3,2,8,'#765055');
+    }
+    rect(x+w-2,y,2,h,'#171620');
+  }
+  function cobweb(x,y,flip) {
+    const points=[[0,23],[9,20],[17,15],[22,8],[24,0]];
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.scale(flip,1);
+    ctx.strokeStyle='#c9a59c78';
+    ctx.lineWidth=.65;
+    ctx.beginPath();
+    for(const [px,py] of points){ctx.moveTo(0,0);ctx.lineTo(px,py);}
+    for(const scale of [.32,.57,.83]){
+      points.forEach(([px,py],i)=>{
+        const method=i===0?'moveTo':'lineTo';
+        ctx[method](Math.round(px*scale),Math.round(py*scale));
+      });
+    }
+    ctx.stroke();
+    ctx.restore();
   }
   function vines(x,y,seed) {
     for(let i=0;i<29;i++){
@@ -134,24 +239,41 @@ const Castle = (() => {
     const wrist=push>0 ? -10-Math.round(push*3) : -8+Math.round(gait);
     poly([[2,-14],[4,-14],[6+reach,wrist],[5+reach,wrist+2],[2,-10]],'#8b9d72');
     rect(5+reach,wrist,2,2,'#e9ad7b');
+    poly([[-5,-13],[-4,-10],[-8,-10],[-11,-13],[-10,-15]],'#7c8d65');
+    rect(-11,-15,2,3,'#e9ad7b');
+    rect(-11,-18,2,4,'#dfbf91');
+    rect(-11,-21,2,3,'#e98d48');
+    rect(-10,-20,1,2,'#fff3bd');
     ctx.restore();
   }
   function steps(x,y,dir,count,rise=4) {
     for(let i=0;i<count;i++) {
       const a=x+dir*i*8,b=y+i*rise;
+      poly([[a-20,b+rise],[a+12,b+rise],[a+9,b+rise*2+2],
+        [a-25,b+rise*2+2]],'#261a286b');
       poly([[a-17,b],[a+17,b],[a+13,b+rise],[a-21,b+rise]],i%2?'#975853':'#a36256');
       poly([[a-21,b+rise],[a+13,b+rise],[a+13,b+rise*2],[a-21,b+rise*2]],'#633942');
       rect(a-13+(i%2)*10,b+1,1,rise-1,'#6e3a40');
       rect(a-19,b+rise,26,1,'#b7735c');
+      rect(a-15,b+rise+1,24,1,'#82504a');
+      rect(a+3-(i%3)*4,b+2,4,1,'#bc7864');
+      if(i%3===0) rect(a-13,b+3,2,1,'#d88e70');
     }
   }
   function door(x,y,open,t) {
     arch(x-5,y-5,54,72,'#9c6451');
     arch(x,y,44,66,'#21191f');
     if(open>0) {
-      arch(x+2,y+2,40,64,'#ffd08a');
-      poly([[x+5,y+55],[x+42,y+55],[x+67+70*open,y+83],[x-22-24*open,y+83]],'#c78758');
-      poly([[x+6,y+61],[x+42,y+61],[x+45+35*open,y+78],[x-12,y+78]],'#deb07a');
+      arch(x+2,y+2,40,64,'#eab173');
+      arch(x+5,y+5,34,61,'#ffe1a2');
+      poly([[x+9,y+65],[x+42,y+65],[x+50+54*open,y+96],[x+39-60*open,y+96]],'#d59a6559');
+      poly([[x+11,y+65],[x+40,y+65],[x+41+31*open,y+92],[x+31-39*open,y+92]],'#facb8a59');
+      for(let i=0;i<9;i++){
+        const distance=(noise(i+13)+t*.21)%1;
+        const px=x+27+(noise(i+51)-.5)*(20+distance*58);
+        const py=y+47+distance*47;
+        rect(px,py,1,1,distance<.6?'#ffecb77a':'#dca27449');
+      }
       glow(x+25,y+54,70,'#ffc27855');
     }
     const w=Math.round(44-open*35);
@@ -176,15 +298,16 @@ const Castle = (() => {
     for(const hinge of [26,53]){
       rect(x+1,y+hinge,5,3,'#3c3134'); rect(x+2,y+hinge,1,1,'#ac8062');
     }
-    lamp(x-15,y+32,t); lamp(x+60,y+32,t);
+    candle(x+60,y+32,t);
   }
   const route=[[98,243],[209,191],[250,191],[196,142],[155,141],[252,85],[290,85]];
   function routePosition(t) {
-    const stops=[0,1.25,1.6,2.65,2.95,4.1,4.5];
+    const stops=[0,1.15,1.62,2.67,3.09,4.04,4.47];
     let i=0;
     while(i<stops.length-2 && t>stops[i+1]) i++;
     const a=route[i], b=route[i+1];
-    const p=Math.min(1,(t-stops[i])/(stops[i+1]-stops[i]));
+    const raw=Math.min(1,(t-stops[i])/(stops[i+1]-stops[i]));
+    const p=i%2?.42*raw+.58*raw*raw*(3-2*raw):raw;
     return [a[0]+(b[0]-a[0])*p,a[1]+(b[1]-a[1])*p,Math.sign(b[0]-a[0])];
   }
   function stairs(t,ease) {
@@ -196,7 +319,15 @@ const Castle = (() => {
     arch(363,27,77,159,'#623b40'); arch(369,31,65,146,'#332433');
     rect(400,42,5,132,'#50323a');
     beam(98,0,125); beam(444,0,233);
+    stonePier(0,0,22,270);
+    stonePier(461,0,19,270);
     vines(438,29,2); vines(26,3,6);
+    for(const [x,y] of [[110,209],[150,170],[209,153],[165,108],[258,65],[309,16]]){
+      poly([[x,y],[x+14,y],[x+12,y+2],[x+6,y+2],[x+8,y+5],[x+1,y+5]],'#352733');
+      rect(x+2,y+5,5,1,'#9a6258');
+      rect(x+12,y-2,2,1,'#996258');
+    }
+    cobweb(128,142,1); cobweb(220,126,-1); cobweb(302,23,1);
     poly([[76,240],[221,164],[296,184],[174,264],[79,264]],'#57323c');
     poly([[135,140],[155,116],[287,104],[264,192],[230,207]],'#54343d');
     poly([[136,129],[264,60],[377,72],[244,153],[152,153]],'#593842');
@@ -206,18 +337,32 @@ const Castle = (() => {
     steps(195,140,1,9,6);
     poly([[194,185],[259,185],[279,197],[207,201]],'#ac6e5a');
     steps(210,188,-1,15);
-    lamp(134,174,t); lamp(311,159,t); lamp(112,99,t);
+    castShadow(215,190,26,9,17);
+    castShadow(156,143,24,8,12);
+    candle(134,174,t);
     rect(100,146,2,10,'#bd7954'); rect(108,146,2,10,'#895344');
-    glow(334,72,90,'#fba85c27');
-    const open=.18*ease((t-4.71)/.36)+.82*ease((t-5.04)/.82);
+    const open=.14*ease((t-4.88)/.28)+.86*ease((t-5.25)/.75);
     door(300,19,open,t);
     const [x,y,dir]=routePosition(t);
-    const reach=ease((t-4.42)/.3)*(1-ease((t-5.52)/.34));
-    if(t<5.9) traveler(x,y,t,dir,reach,t<4.48);
-    else traveler(290+38*ease((t-5.9)/.8),85-9*ease((t-5.9)/.8),t,1,0,t<6.7);
+    const reach=ease((t-4.49)/.37)*(1-ease((t-5.66)/.36));
+    let lightX=x, lightY=y;
+    if(t<6.02) traveler(x,y,t,dir,reach,t<4.47);
+    else if(t<6.93) {
+      const crossing=ease((t-6.02)/.84);
+      lightX=290+37*crossing;
+      lightY=85-12*crossing;
+      ctx.save();
+      ctx.globalAlpha=1-ease((crossing-.71)/.29);
+      traveler(lightX,lightY,t);
+      ctx.restore();
+    } else {
+      lightX=327;
+      lightY=73;
+    }
     const shade=ctx.createLinearGradient(0,175,0,270);
     shade.addColorStop(0,'transparent'); shade.addColorStop(1,'#18122185');
     ctx.fillStyle=shade;ctx.fillRect(0,175,480,95);
+    stairLighting(t,open,lightX,lightY,dir,ease);
   }
   function moonWindow(x,y){
     arch(x-6,y-7,84,126,'#66505d'); arch(x,y,72,115,'#303554');
@@ -261,14 +406,26 @@ const Castle = (() => {
     }
   }
   function chair(x,y,c) {
+    castShadow(x-3,y+20,22,9,12);
     rect(x,y,16,20,'#3b2928'); rect(x+2,y,12,15,c);
     rect(x-3,y+12,22,5,'#885543'); rect(x,y+16,16,4,c);
     rect(x,y+20,2,4,'#2b2022'); rect(x+14,y+20,2,4,'#2b2022');
+    rect(x+3,y+1,10,1,'#d1a87865');
+    rect(x+4,y+3,1,8,'#ecd09b38');
+    rect(x+7,y+6,2,2,'#d0a57b');
+    rect(x+1,y+17,14,1,'#ead1ad30');
+    rect(x+1,y+19,14,1,'#271c2740');
   }
   function rug(x,y,w,c) {
     poly([[x,y],[x+w,y],[x+w+12,y+14],[x-10,y+14]],'#402831');
     poly([[x+1,y+2],[x+w-1,y+2],[x+w+8,y+12],[x-6,y+12]],c);
-    for(let i=5;i<w-4;i+=7) rect(x+i,y+5,3,4,'#a36958');
+    rect(x+1,y+2,w-2,1,'#d2a47a75');
+    rect(x-5,y+11,w+11,1,'#d2a47a75');
+    for(let i=5;i<w-4;i+=7){
+      rect(x+i,y+5,3,4,'#a36958');
+      rect(x+i+1,y+6,1,2,'#dfb486');
+      rect(x+i-6,y+14,2,2,'#96755d');
+    }
   }
   function crt(x,y) {
     rect(x-3,y+16,33,4,'#926044'); rect(x,y+20,3,7,'#53352c'); rect(x+24,y+20,3,7,'#53352c');
@@ -278,13 +435,40 @@ const Castle = (() => {
     poly([[x+5,y+11],[x+10,y+7],[x+13,y+10],[x+17,y+8],[x+19,y+11]],'#9caf96');
     rect(x+24,y+4,2,2,'#c3845a'); rect(x+24,y+8,2,2,'#d2a169');
   }
+  function pottedFern(x,y) {
+    castShadow(x-5,y+4,10,5,9);
+    poly([[x-6,y-4],[x+6,y-4],[x+4,y+5],[x-4,y+5]],'#8e5445');
+    rect(x-6,y-5,12,2,'#bf8564');
+    rect(x,y-19,1,15,'#68784e');
+    for(const [dx,dy] of [[-9,-16],[6,-15],[-7,-12],[5,-10],[-4,-21],[3,-23]]){
+      poly([[x,y-7],[x+dx,y+dy],[x+dx+3,y+dy],[x+1,y-9]],dx<0?'#52715c':'#7c8f63');
+      rect(x+dx+1,y+dy,2,1,'#9da97a');
+    }
+  }
+  function crystals(x,y) {
+    castShadow(x-6,y,15,5,7);
+    poly([[x-7,y],[x-8,y-7],[x-5,y-11],[x-2,y-7],[x-1,y],[x-4,y+2]],'#74648e');
+    poly([[x-2,y],[x-2,y-12],[x+2,y-17],[x+6,y-12],[x+5,y],[x+2,y+2]],'#667ca0');
+    poly([[x+1,y-14],[x+2,y-17],[x+5,y-12],[x+3,y-2],[x+1,y]],'#a1bfd0');
+    poly([[x+5,y],[x+6,y-7],[x+10,y-9],[x+11,y-5],[x+9,y]],'#926e9b');
+  }
+  function chandelier(x,y,t) {
+    for(let i=0;i<y-4;i+=4){
+      rect(x-1,i,3,3,'#392b33'); rect(x,i,1,2,'#a07b5c');
+    }
+    poly([[x-22,y],[x+22,y],[x+24,y+3],[x+15,y+7],[x-15,y+7],[x-24,y+3]],'#3e2c32');
+    rect(x-20,y+2,40,2,'#99704d');
+    rect(x-12,y+5,24,1,'#6d4a3a');
+    for(const dx of [-18,-7,7,18]) candle(x+dx,y-5,t);
+  }
   function animals(t) {
     // Owl on the moon sill, sleeping cat by the hearth, fawn in the lower alcove.
     rect(295,121,9,9,'#9c7859'); rect(295,119,2,3,'#bb946d'); rect(302,119,2,3,'#bb946d');
     rect(296,122,7,4,'#d6b082');
     if(Math.floor(t*3)%13!==0){rect(297,123,1,2,'#2f2530');rect(301,123,1,2,'#2f2530');}
     rect(299,125,1,2,'#d79953');
-    rect(341,191,15,6,'#b87558'); rect(349,187,8,8,'#ce895f');
+    const breath=Math.floor((Math.sin(t*2.4)+1)*.75);
+    rect(341,191-breath,15,6+breath,'#b87558'); rect(349,187,8,8,'#ce895f');
     rect(349,185,2,3,'#ce895f'); rect(355,185,2,3,'#ce895f');
     rect(352,191,3,1,'#52363a'); rect(338,194,14,2,'#da9a69');
     rect(171,221,19,8,'#b98260'); rect(181,213,6,11,'#c4906b');
@@ -292,8 +476,9 @@ const Castle = (() => {
     rect(191,213,2,2,'#edd09f');rect(188,211,1,1,'#2b242b');
     rect(173,228,2,7,'#87604f'); rect(185,228,2,7,'#87604f');
     rect(175,223,2,1,'#f5c796'); rect(179,222,2,1,'#f5c796');
+    if(t%4>2.86 && t%4<3.24) rect(187,205,3,2,'#b47b62');
   }
-  function room(t,progress,walk) {
+  function room(t,progress,walk,ease) {
     rect(0,0,480,270,palette.night);
     masonry(0,0,480,212,false);
     poly([[0,0],[57,25],[57,177],[0,230]],'#2b242f');
@@ -302,7 +487,13 @@ const Castle = (() => {
     rect(62,16,153,3,'#57383a'); rect(60,15,156,1,'#875746');
     moonWindow(240,14);
     boards(0,204,480,66);
-    poly([[248,128],[305,128],[395,252],[240,231]],'#7885a049');
+    poly([[245,122],[310,122],[397,252],[227,231]],'#6e79aa21');
+    poly([[249,124],[268,124],[296,238],[242,232]],'#9aaed13d');
+    poly([[273,124],[299,124],[368,248],[306,240]],'#8dacd13d');
+    poly([[303,124],[308,124],[385,250],[376,249]],'#b0bdd530');
+    castShadow(38,211,61,14,22);
+    castShadow(105,232,37,16,24);
+    castShadow(354,178,39,12,-24);
     // Left gallery and diagonal stairs down to the main level.
     poly([[11,134],[147,134],[210,163],[54,163]],'#8a5843');
     poly([[54,163],[210,163],[210,176],[54,176]],'#4b3031');
@@ -315,9 +506,13 @@ const Castle = (() => {
     for(let i=0;i<9;i++){
       const x=206+i*3,y=166+i*5;
       rect(x,y,31,4,'#92604b'); rect(x,y+4,31,2,'#50343a');
+      rect(x+2,y,27,1,'#ba8260');
+      rect(x+5,y+2,10+(i%3)*3,1,'#744b3c');
     }
     shelf(20,52,44,6,1); shelf(70,47,47,6,2); shelf(128,30,53,7,3);
     shelf(188,47,36,6,33); shelf(332,32,48,7,4); shelf(389,20,51,8,6);
+    chandelier(207,33,t);
+    pottedFern(69,141);
     rect(377,8,65,5,'#6d4540'); rect(379,8,65,1,'#aa7652');
     vines(447,17,5);
     rect(184,83,2,48,'#a16f53'); rect(192,83,2,48,'#a16f53');
@@ -332,19 +527,27 @@ const Castle = (() => {
     shelf(10,144,48,4,16); rug(51,222,62,'#68534f');
     crt(31,196); chair(78,198,'#784d4d'); shelf(104,183,36,4,21);
     lamp(94,181,t);
+    pottedFern(17,231);
     // Hearth and chair sit at a different depth from the CRT nook.
     rug(322,191,65,'#8f5048'); fire(348,141,t); chair(399,162,'#6a7856');
+    ornament(348,125,'vase'); ornament(382,125,'frame');
+    crystals(316,194);
     rect(411,185,13,4,'#8c563c'); rect(414,188,2,6,'#472d2b');
     rect(415,181,5,4,'#a57859'); rect(420,182,2,2,'#ba9269');
     shelf(430,142,39,5,32); lamp(451,133,t);
     // Foreground shelf makes a small reading alcove on the right.
     rug(385,233,68,'#71504c'); chair(408,201,'#775753');
     rect(392,222,15,5,'#925d42'); rect(394,226,2,5,'#482b28'); rect(396,219,8,3,'#d9a66a');
+    ornament(421,220,'box');
+    candle(399,217,t);
+    pottedFern(461,218);
     lamp(451,203,t); shelf(441,222,38,3,5);
     // Entrance and the traveling silhouette stay visible during the pullback.
     arch(271,159,30,46,'#62413b');
     poly([[274,172],[279,165],[288,162],[295,168],[298,176],[298,204],[274,204]],'#392830');
     rect(274,201,26,3,'#a66a4c');
+    poly([[277,200],[295,200],[318,226],[264,226]],'#f4be7d30');
+    glow(286,198,37,'#e7a2683d');
     animals(t);
     traveler(285-26*progress,207+16*progress,t,-1,0,walk);
     for(let i=0;i<25;i++){
@@ -352,9 +555,59 @@ const Castle = (() => {
       const x=35+noise(i+815)*410;
       rect(x,y,1,1,i%3===0?'#c89668':'#8e726955');
     }
+    const flicker=.5+.5*Math.sin(t*11+Math.sin(t*7));
+    glow(373,175,68,`rgba(250,146,74,${.11+.05*flicker})`);
+    glow(262,102,76,'#95bdfa19');
+    glow(42,203,38,'#80b3a61d');
+    const corners=ctx.createRadialGradient(272,150,96,272,150,264);
+    corners.addColorStop(0,'#15111c00');
+    corners.addColorStop(1,'#15111cad');
+    ctx.fillStyle=corners;
+    ctx.fillRect(0,0,480,270);
+    stonePier(0,217,16,53);
+    stonePier(469,185,11,85);
+    const reveal=ease((t-7.1)/3.47);
+    if(reveal<1){
+      const x=285-26*progress, y=207+16*progress;
+      shadowLayer(()=>{
+        glow(x+6,y-20,52+reveal*57,'#000000ff');
+        glow(x-15,y-15,48+reveal*58,'#000000bf');
+        glow(274,73,48+reveal*96,`rgba(0,0,0,${.50+.46*reveal})`);
+        glow(285,124,41+reveal*104,`rgba(0,0,0,${.21+.7*reveal})`);
+      },1-reveal);
+      glow(x+6,y-21,32,'#ffc38225');
+    }
     const shade=ctx.createLinearGradient(0,223,0,270);
     shade.addColorStop(0,'transparent');shade.addColorStop(1,'#19131cc2');
     ctx.fillStyle=shade;ctx.fillRect(0,223,480,47);
+  }
+  function shot(context,time,ease,still,interior,opacity=1) {
+    ctx=setBuffer.getContext('2d');
+    rect(0,0,480,270,palette.night);
+    let zoom, focusX, focusY;
+    if(!interior){
+      stairs(time,ease);
+      const [x,y]=routePosition(time);
+      const doorFocus=ease((time-3.3)/2.65);
+      const threshold=ease((time-6.18)/.76);
+      zoom=1.40+.96*doorFocus+.38*threshold;
+      focusX=(x+34)*(1-doorFocus)+(321+5*threshold)*doorFocus;
+      focusY=Math.min(233,y-12)*(1-doorFocus)+55*doorFocus;
+    } else {
+      room(time,ease((time-7.08)/2.2),!still&&time<9.28,ease);
+      const pullback=ease((time-7.05)/3.65);
+      zoom=1+1.13*(1-pullback);
+      focusX=284;
+      focusY=166-36*ease((time-7.25)/1.75);
+    }
+    // Scale the pixel buffer after drawing the set, keeping sprite edges crisp.
+    ctx=context;
+    ctx.save();
+    ctx.globalAlpha=opacity;
+    ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(setBuffer,Math.round(focusX*(1-zoom)),Math.round(focusY*(1-zoom)),
+      Math.round(480*zoom),Math.round(270*zoom));
+    ctx.restore();
   }
   return {draw(context,time,ease,still=false){
     if(!setBuffer){
@@ -362,32 +615,19 @@ const Castle = (() => {
       setBuffer.width=480;
       setBuffer.height=270;
     }
-    ctx=setBuffer.getContext('2d');
-    rect(0,0,480,270,palette.night);
-    let zoom, focusX, focusY;
-    if(time<6.85){
-      stairs(time,ease);
-      const doorFocus=ease((time-3.15)/2.75);
-      zoom=1+1.28*doorFocus;
-      focusX=330;
-      focusY=68;
-    } else {
-      room(time,ease((time-7.08)/2.2),!still&&time<9.28);
-      zoom=1+1.75*(1-ease((time-7.05)/3.65));
-      focusX=284;
-      focusY=178;
-    }
-    // Scale the pixel buffer after drawing the set, keeping sprite edges crisp.
-    ctx=context;
-    ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(setBuffer,Math.round(focusX*(1-zoom)),Math.round(focusY*(1-zoom)),
-      Math.round(480*zoom),Math.round(270*zoom));
-    const light=1-ease(Math.abs(time-6.85)/.43);
+    context.save();
+    context.scale(context.canvas.width/480,context.canvas.height/270);
+    const blend=ease((time-6.62)/.60);
+    if(blend<1) shot(context,time,ease,still,false);
+    if(blend>0) shot(context,time,ease,still,true,blend);
+    // Keep the threshold readable through the bloom. The room fades in beneath it.
+    const light=ease((time-6.31)/.57)*(1-ease((time-6.92)/.58));
     if(light>0){
-      ctx.save();ctx.globalAlpha=light;
-      rect(0,0,480,270,'#bc865c');
-      ctx.restore();
+      const x=326-42*blend,y=48+137*blend;
+      glow(x,y,42+104*light,`rgba(255,215,159,${.38*light})`);
+      glow(x,y,125+120*light,`rgba(230,158,100,${.17*light})`);
     }
+    context.restore();
   }};
 })();
 
