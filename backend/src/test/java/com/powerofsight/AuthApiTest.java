@@ -72,6 +72,28 @@ class AuthApiTest extends ApiTestSupport {
     }
 
     @Test
+    @DisplayName("帶著無效的舊 cookie 仍可註冊、登入與登出")
+    void staleCookieDoesNotBlockPublicEndpoints() throws Exception {
+        Cookie stale = new Cookie("pos_token", "not.a.jwt");
+
+        mvc.perform(withJson(
+                                post("/api/auth/register"),
+                                Map.of("email", "alice@example.com", "password", "password123", "displayName", "Alice"))
+                        .cookie(stale))
+                .andExpect(status().isCreated());
+
+        mvc.perform(withJson(post("/api/auth/login"), Map.of("email", "alice@example.com", "password", "password123"))
+                        .cookie(stale))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/api/auth/logout").cookie(stale))
+                .andExpect(status().isNoContent())
+                .andExpect(cookie().maxAge("pos_token", 0));
+
+        mvc.perform(get("/api/health").cookie(stale)).andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("登入後 /me 回傳自己；登出會清掉 cookie")
     void loginMeLogout() throws Exception {
         register("alice@example.com", "Alice");

@@ -21,7 +21,7 @@
 | 後端 | Spring Boot 3.5、Java 21、Spring Security、Spring Data JPA、Flyway |
 | 登入 | Email + 密碼（BCrypt），後端簽發 JWT，放在 httpOnly cookie |
 | 資料庫 | 本機 H2（免安裝）；正式環境 PostgreSQL（`docker-compose.yml`） |
-| 測試 | JUnit 5 + MockMvc 整合測試（17 項） |
+| 測試 | JUnit 5 + MockMvc 整合測試（18 項） |
 
 ```
 瀏覽器 ──► Next.js (:3000) ──/api/*──► Spring Boot (:8080) ──► H2 / PostgreSQL
@@ -32,7 +32,7 @@
 
 ## 在自己電腦上跑起來
 
-需要：**JDK 21**、**Node.js 24 以上**。
+需要：**JDK 21**、**Node.js 24 以上**。Maven Wrapper 依 `JAVA_HOME` 選擇 JDK，請確認它指向 JDK 21。
 
 **1. 啟動後端**（第一個終端機）
 
@@ -52,6 +52,8 @@ npm run dev
 ```
 
 打開 http://localhost:3000 → 建立書房 → 開始放作品。
+
+**改用 PostgreSQL**（選用，需要 Docker）：步驟見 [資料庫設計：切換到 PostgreSQL](docs/02-資料庫設計.md#切換到-postgresql)。
 
 **跑後端測試**
 
