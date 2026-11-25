@@ -101,6 +101,7 @@
     "notesHint": "Everything below is optional — add it whenever you like.",
     "preference": "How much it meant to you",
     "review": "Notes",
+    "reviewPlaceholder": "Why do you want to keep this?",
     "status": "Status",
     "statusNone": "Not set",
     "completedOn": "Finished on",
