@@ -64,7 +64,7 @@ function toInput(d: Draft): EntryInput {
 
 /**
  * 新增和編輯共用的表單。只有「種類」和「名稱」必填，
- * 喜好、心得、狀態、完成日期都可以之後再補。
+ * 喜好、備註、狀態、完成日期都可以之後再補。
  */
 export function EntryForm({
   entry,
@@ -198,6 +198,7 @@ export function EntryForm({
           <textarea
             value={draft.review}
             onChange={(e) => set('review', e.target.value.slice(0, REVIEW_MAX))}
+            placeholder={t('reviewPlaceholder')}
             maxLength={REVIEW_MAX}
             rows={4}
             className={inputClass}
